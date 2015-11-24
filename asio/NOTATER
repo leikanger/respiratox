@@ -1,0 +1,4 @@
+For å linke notater: 
+    g++ boost.test.cpp -lboost_filesystem -lboost_system 
+
+BOOST::file_system er genial for interraksjon med file system (en tilnærming til å lese I2C)!

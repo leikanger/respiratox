@@ -1,0 +1,5 @@
+PLAN:
+    - Mini-pc (rasberry pi eller beaglebone) skal samle data og presentere dette på nettverket ved boost.asio (server)
+    - Desctop skal ha en client som henter data fra server, og dette skal presenteres i live-plot.
+
+    Fokuser på TDD, kanskje ved googleTest?
