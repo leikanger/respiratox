@@ -11,13 +11,15 @@ class continuousPlotter:
     def __init__(self):
         # some X and Y data
         self.x = np.arange(10000)
-        self.data = np.random.randn(10000)
+        self.data = np.zeros(10000) #pow(2,16)*np.random.randn(10000)
         
         self.fig = plt.figure()
+        plt.ylim([-pow(2,15),pow(2,15)])
         self.ax = self.fig.add_subplot(111)
         self.li, = self.ax.plot(self.x, self.data)
 
         # draw and show it
+        plt.ion()
         self.fig.canvas.draw()
         plt.show(block=False)
 
@@ -37,10 +39,11 @@ class continuousPlotter:
         #except KeyboardInterrupt:
             
 
-
 if __name__ == "__main__":
     import numpy as np
     import time
+
+    print("Running EXAMPLE of continuousPlotter.py")
 
     sig = np.sin( np.linspace(0, 2*np.pi, 10000) )
 
