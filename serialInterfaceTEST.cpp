@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE serial_communication
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
+#include <cstdlib>
 
 #include "serialInterface.h"
 
@@ -8,11 +9,6 @@ using std::cout;
 namespace utf = boost::unit_test;
 
 BOOST_AUTO_TEST_SUITE(MOCK_serial_communication);
-BOOST_AUTO_TEST_CASE( jeje )
-{
-    BOOST_CHECK_EQUAL( 9, 9 ); 
-}
-
 BOOST_AUTO_TEST_CASE( constructing )
 {
     MockSerial serial;
@@ -27,6 +23,21 @@ BOOST_AUTO_TEST_CASE( mockSendAndReceive )
 }
 BOOST_AUTO_TEST_SUITE_END();
 
+BOOST_AUTO_TEST_SUITE(serial_communication_with_tempfile);
+BOOST_AUTO_TEST_CASE( writeToTempfile )
+{
+    system("touch ./tempFile.log");
+    Serial serialInterface("./tempFile.log");
+    std::string sendtStreng = "ASDFqwer1234";
+    serialInterface.sendMessage(sendtStreng);
+    usleep(100);
+    std::ifstream fileInput("./tempFile.log");
+    std::string lestTekststreng;
+    std::getline(fileInput, lestTekststreng);
+    BOOST_CHECK_EQUAL(sendtStreng, lestTekststreng);
+    //system("rm ./tempFile.log");
+}
+BOOST_AUTO_TEST_SUITE_END();
 
 
 
