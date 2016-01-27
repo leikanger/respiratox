@@ -20,7 +20,6 @@ public:
 
     void sendMessage(const std::string &sstringArg);
     const std::string getMessage() const;
-
 };
 
 /** mockSerial class **/
@@ -29,7 +28,7 @@ class MockSerial : public SerialInterface {
 public:
     MockSerial() : lastString("") {}
 
-    void sendMessage(const std::string &sstringArg);
+    void sendMessage(const std::string & sstringArg);
     const std::string getMessage() const;
 };
 

@@ -37,6 +37,11 @@ BOOST_AUTO_TEST_CASE( writeToTempfile )
     BOOST_CHECK_EQUAL(sendtStreng, lestTekststreng);
     //system("rm ./tempFile.log");
 }
+BOOST_AUTO_TEST_CASE( writeToLiveDevFile )
+{
+    Serial liveTest("/dev/ttyACM1");
+    liveTest.sendMessage("LIVE");
+}
 BOOST_AUTO_TEST_SUITE_END();
 
 

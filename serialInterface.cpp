@@ -33,6 +33,7 @@ void MockSerial::sendMessage(const std::string& sstringArg)
     lastString = sstringArg;
 }
  
-const std::string MockSerial::getMessage() const {
+const std::string MockSerial::getMessage() const 
+{
     return lastString;
 }
