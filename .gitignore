@@ -1,0 +1,8 @@
+# Swap files and logs
+*.swp
+*.log
+
+# Object files and executables
+###################################
+*.out
+*.o
