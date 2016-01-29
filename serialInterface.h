@@ -20,7 +20,7 @@ public:
     Serial(const std::string& port, unsigned int baud_rate);
     ~Serial();
 
-    bool read(std::string& textBuffer, const unsigned numberOfChars);
+    bool read(std::string* pTextBuffer);
 private:
 
     boost::asio::io_service io;
