@@ -37,16 +37,43 @@ Serial::~Serial()
     serialPort.close(); 
 }
 
+/**********************************
+ * Serial::read(sting&, unsigned) *
+ *  - reads out string of chars untill MESSAGE_SEPARATOR character
+ *      (defined on top of function)
+ *  TODO Define start of message? Fault-tolerance!    
+ */
 bool Serial::read(std::string& tekstBuffer, const unsigned numberOfChars)
 {
+    const char MESSAGE_SEPARATOR = '\n';
+    static char nextChar;
+    tekstBuffer = "";
+
     std::cout<<"Forsøker å lese inn til buffer (med nå-innhold:" <<tekstBuffer 
              <<", og antall bokstaver: " <<numberOfChars <<std::endl;
     boost::system::error_code ec;
-    //std::vector<char> charBuffer(128);
-    char charBuffer[128];
-    bASIO::read(serialPort, bASIO::buffer(charBuffer, 128), ec);
+
+    while (!ec) {
+        bASIO::read(serialPort, bASIO::buffer(&nextChar, 1), ec);
+        if (nextChar == MESSAGE_SEPARATOR)
+            break;
+        tekstBuffer.push_back(nextChar);
+    }
+    if (ec) {
+        std::cout<<"error : serialPort set baud_rate faila : reported error ec=" 
+            <<ec.message().c_str() <<std::endl;
+        // terminate!! 
+        exit(0);
+        return false;
+    }
+
+#if 0
+    char charBuffer[128] = {'\0'};
+    bASIO::read(serialPort, bASIO::buffer(charBuffer, numberOfChars), ec);
     tekstBuffer = std::string(charBuffer);
     //tekstBuffer = std::string(charBuffer.begin(), charBuffer.end());
+    return true;
+#endif
     return true;
 }
 
