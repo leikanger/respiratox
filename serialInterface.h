@@ -18,9 +18,9 @@ public:
 class Serial {
 public:
     Serial(const std::string& port, unsigned int baud_rate);
-    ~Serial() { /* TODO Stop service og port og whatnot.. */ }
+    ~Serial();
 
-    bool read(std::string* pTextBuffer, const unsigned numberOfChars);
+    bool read(std::string& textBuffer, const unsigned numberOfChars);
 private:
 
     boost::asio::io_service io;

@@ -32,14 +32,21 @@ Serial::Serial(const std::string& portPath, unsigned int baudRateArg)
         exit(0);
     }
 }
-
-bool Serial::read(std::string* pTekstBuffer, const unsigned numberOfChars)
+Serial::~Serial()
 {
-    std::cout<<"Forsøker å lese inn til buffer (med nå-innhold:" <<*pTekstBuffer 
+    serialPort.close(); 
+}
+
+bool Serial::read(std::string& tekstBuffer, const unsigned numberOfChars)
+{
+    std::cout<<"Forsøker å lese inn til buffer (med nå-innhold:" <<tekstBuffer 
              <<", og antall bokstaver: " <<numberOfChars <<std::endl;
-    char charBuffer; //[numberOfChars+1] = '\0';
     boost::system::error_code ec;
-    bASIO::read(serialPort, bASIO::buffer(&charBuffer, 1), ec);
+    //std::vector<char> charBuffer(128);
+    char charBuffer[128];
+    bASIO::read(serialPort, bASIO::buffer(charBuffer, 128), ec);
+    tekstBuffer = std::string(charBuffer);
+    //tekstBuffer = std::string(charBuffer.begin(), charBuffer.end());
     return true;
 }
 

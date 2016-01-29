@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( ConstructSerialObject )
     Serial testObj(path, 9600);
     cout<<"Fekk åpna path " <<path <<std::endl;
     std::string lestStreng;
-    testObj.read(&lestStreng, 1);
+    testObj.read(lestStreng, 10);
     std::cout<<"HURRA: Eg har lest : |||_" <<lestStreng <<"_|||\n";
 }
 /*
