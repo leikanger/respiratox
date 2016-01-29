@@ -6,7 +6,8 @@
 #include "serialInterface.h"
 
 using std::cout;
-namespace utf = boost::unit_test;
+//namespace utf = boost::unit_test;
+namespace bASIO = boost::asio;
 
 BOOST_AUTO_TEST_SUITE(MOCK_serial_communication);
 BOOST_AUTO_TEST_CASE( constructing )
@@ -48,12 +49,27 @@ bool fileExists(const std::string& filePath)
 }
 BOOST_AUTO_TEST_CASE( ConstructSerialObject )
 {
-    std::string path = "/dev/ttyACM1"; //"/dev/pts/3";
+    std::string path = "/dev/pts/0";
+    Serial testObj(path, 9600);
+    boost::system::error_code ec;
+
+    // XXX En variant: forsøk å skrive (og gå ut fra at den gir feilmelding
+    // dersom det ikkje går gjennom, eller obj ikkje er konstruert)
+    // XXX En variant: å lese ut en option fra porten.
+//    bASIO::get_option(boost::asio::serial_port_base::baud_rate(baudRateArg), ec);
+    if (ec) { std::cout<<"TEST: get_option failed with message: " <<ec.message().c_str() <<std::endl; }
+}
+BOOST_AUTO_TEST_CASE( ReadFromArduino )
+{
+    // MERK: dersom man sender ' ' (space) inn i arduino-monitoren, får man
+    // ikkje med dei to første characters. Dette gir ønske om å teste for
+    // start-character også (i read-funksjonen)!
+    std::string path = "/dev/pts/3";
     Serial testObj(path, 9600);
     cout<<"Fekk åpna path " <<path <<std::endl;
     std::string lestStreng;
     BOOST_CHECK( testObj.read(&lestStreng) );   // returnerer false ved feil.
-    std::cout<<"HURRA: Eg har lest : |||_" <<lestStreng <<"_|||\n";
+    std::cout<<"HURRA: Eg har lest : [[[" <<lestStreng <<"]]]\n";
 }
 /*
  * BOOST_AUTO_TEST_CASE( VerifyVirtualSerialPortOperation )

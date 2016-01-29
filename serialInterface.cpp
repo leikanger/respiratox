@@ -1,5 +1,7 @@
 #include "serialInterface.h"
+#include <string>
 #include <iostream>
+#include <exception>
 
 namespace bASIO=boost::asio;
 
@@ -42,6 +44,9 @@ Serial::~Serial()
  *  - reads out string of chars untill MESSAGE_SEPARATOR character
  *      (defined on top of function)
  *  TODO Define start of message? Fault-tolerance!    
+ *  An other variant is to save the rest of the message in a static variable,
+ *  and continue where it left off last time -- and read in data in batches.
+ *  Better for efficiency (but don't start with optimalization!)
  */
 bool Serial::read(std::string* pTekstBuffer)
 {
@@ -49,7 +54,6 @@ bool Serial::read(std::string* pTekstBuffer)
     static char nextChar;
     *pTekstBuffer = "";
 
-    std::cout<<"Forsøker å lese inn til buffer (med nå-innhold:" <<*pTekstBuffer <<std::endl;
     boost::system::error_code ec;
 
     while (!ec) {
@@ -65,6 +69,12 @@ bool Serial::read(std::string* pTekstBuffer)
         exit(0);
         return false;
     }
+
+    if (nextChar != '\n') {
+		// it must have timed out.
+        return false;
+		//throw std::exception("Read timed out!");
+	}
     return true;
 }
 

@@ -21,6 +21,7 @@ public:
     ~Serial();
 
     bool read(std::string* pTextBuffer);
+    //bool write(std::string* pTextBuffer, unsigned numberOfChars);
 private:
 
     boost::asio::io_service io;
