@@ -4,10 +4,11 @@ LIBR=-lboost_system -lboost_thread
 
 all: test
 
-runTests: test
+# Neste lager og kjører testen!
+test: test_without_running
 	./testAll.out
 
-test: serialInterface.o serialInterfaceTEST.cpp
+test_without_running: serialInterface.o serialInterfaceTEST.cpp
 	$(CC) $(CFLAGS) $(LIBR) -lboost_unit_test_framework serialInterfaceTEST.cpp serialInterface.o -o testAll.out
 
 serialInterface.o: serialInterface.cpp serialInterface.h

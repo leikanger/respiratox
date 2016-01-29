@@ -21,13 +21,13 @@ BOOST_AUTO_TEST_CASE( mockSendAndReceive )
     serialMock.sendMessage("melding");
     BOOST_CHECK_EQUAL("melding", serialMock.getMessage());
 }
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END(); //MOCK_serial_communication
 
 BOOST_AUTO_TEST_SUITE(serial_communication_with_tempfile);
 BOOST_AUTO_TEST_CASE( writeToTempfile )
 {
     system("touch ./tempFile.log");
-    Serial serialInterface("./tempFile.log");
+    FileSerial serialInterface("./tempFile.log");
     std::string sendtStreng = "ASDFqwer1234";
     serialInterface.sendMessage(sendtStreng);
     usleep(100);
@@ -37,12 +37,43 @@ BOOST_AUTO_TEST_CASE( writeToTempfile )
     BOOST_CHECK_EQUAL(sendtStreng, lestTekststreng);
     //system("rm ./tempFile.log");
 }
+bool fileExists(const std::string& filePath)
+{
+    if (FILE *file = fopen(filePath.c_str(), "r")) {
+        fclose(file);
+        return true;
+    } else {
+        return false; 
+    }
+}
+BOOST_AUTO_TEST_CASE( ConstructSerialObject )
+{
+    std::string path = "/dev/ttyACM1"; //"/dev/pts/3";
+    Serial testObj(path, 9600);
+    cout<<"Fekk åpna path " <<path <<std::endl;
+    std::string lestStreng;
+    testObj.read(&lestStreng, 1);
+    std::cout<<"HURRA: Eg har lest : |||_" <<lestStreng <<"_|||\n";
+}
+/*
+ * BOOST_AUTO_TEST_CASE( VerifyVirtualSerialPortOperation )
+{
+    std::string filepathSerial1 = "/dev/pts/3";
+    std::string filepathSerial2 = "/dev/pts/4";
+    //BOOST_CHECK(fileExists(filepathSerial1) && fileExists(filepathSerial2));
+    std::cout<<"ctor kalles med arg: " <<filepathSerial1 <<", 96000\n";
+    Serial port1{filepathSerial1, 96000};
+    //Serial port2{"./VirtualSerialPortOut", 96000};
+     
+}*/
+
 BOOST_AUTO_TEST_CASE( writeToLiveDevFile )
 {
-    Serial liveTest("/dev/ttyACM1");
+    // TODO: neste setning har ingen tester, og er dårlig..
+    FileSerial liveTest("/dev/ttyACM1");
     liveTest.sendMessage("LIVE");
 }
-BOOST_AUTO_TEST_SUITE_END();
+BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
 
 
