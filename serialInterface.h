@@ -17,40 +17,16 @@ public:
 /************/
 class Serial {
 public:
-    Serial(const std::string& port, unsigned int baud_rate, boost::system::error_code* pec =nullptr);
+    Serial(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
     ~Serial();
 
     bool read(std::string* pTextBuffer);
-    //bool write(std::string* pTextBuffer, unsigned numberOfChars);
+    bool write(const std::string& pTextBuffer);
 private:
 
     boost::asio::io_service io;
     boost::asio::serial_port serialPort;
 };
 
-/****************
- ** FileSerial **
- ***************/
-class FileSerial : public SerialInterface {
-    std::fstream serialFileStream;
-
-public:
-    FileSerial(const std::string& filePathToSerialinterface );
-    ~FileSerial();
-
-    void sendMessage(const std::string &sstringArg);
-    const std::string getMessage() const;
-};
-
-/** mockSerial class **/
-// Denne er utdatert. Kan takast bort (men da må man rydde opp i unit tests)
-class MockSerial : public SerialInterface {
-    std::string lastString;
-public:
-    MockSerial() : lastString("") {}
-
-    void sendMessage(const std::string & sstringArg);
-    const std::string getMessage() const;
-};
 
 #endif

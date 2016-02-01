@@ -13,7 +13,9 @@ namespace bASIO=boost::asio;
  * \throws boost::system::system_error if cannot open the
  * serial device
 **/
-Serial::Serial(const std::string& portPath, unsigned int baudRateArg, boost::system::error_code* pec /*==null_ptr*/)
+Serial::Serial( const std::string& portPath,
+                unsigned int baudRateArg /*=9600*/,
+                boost::system::error_code* pec /*==null_ptr*/)
     : io(), serialPort(io)//serialPort(io, port)
 {
     std::cout<<"Constructing Serial object with path: " <<portPath <<" baud_rate: " <<baudRateArg <<"\n";
@@ -86,6 +88,14 @@ bool Serial::read(std::string* pTekstBuffer)
     return true;
 }
 
+bool Serial::write(const std::string& pTextBuffer)
+{
+    /* THE FOLLLOWING IS ONLY FOR TEST SETUP THAT THE TESTS WORKS..
+     /* std::string cmdString = "echo '" + pTextBuffer +"' > " + "/dev/pts/3\n";
+      return !system(cmdString.c_str());
+     */
+    std::cout<<"Eternal hangup -- continue here, serialInterface.cpp l. 97\n";
+}
 /*
 bool Serial::sendMessage(const std::string& tekst) const
 {
@@ -101,37 +111,3 @@ bool Serial::sendMessage(const std::string& tekst) const
     return true;
 }
 */
-
-// FileSerial
-FileSerial::FileSerial(const std::string& filePathToSerialinterface )
-{
-    // TODO: Legg inn try {} catch {} feilhåndtering her!
-    serialFileStream.open(filePathToSerialinterface.c_str(), std::fstream::in | std::fstream::out);
-}
-FileSerial::~FileSerial()
-{
-    serialFileStream.close(); 
-}
-
-void FileSerial::sendMessage(const std::string &sstringArg)
-{
-   serialFileStream<<sstringArg; 
-}
-
-const std::string FileSerial::getMessage() const
-{
-    std::string line;
-    //std::getline(serialFileStream, line);
-    return line;
-}
-
-// MOCK
-void MockSerial::sendMessage(const std::string& sstringArg)
-{
-    lastString = sstringArg;
-}
- 
-const std::string MockSerial::getMessage() const 
-{
-    return lastString;
-}

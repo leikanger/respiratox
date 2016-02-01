@@ -11,39 +11,11 @@ namespace bASIO = boost::asio;
 
 // The following serial ports are crated with [socat] shell command, and is
 // used for dummy-testing in TDD.
-static const std::string SERIAL_PORT_DUMMY_IN = "/dev/pts/4";
-static const std::string SERIAL_PORT_DUMMY_OUT= "/dev/pts/3";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "/dev/pts/3";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/4";
 
 
-BOOST_AUTO_TEST_SUITE(MOCK_serial_communication);
-BOOST_AUTO_TEST_CASE( constructing )
-{
-    MockSerial serial;
-    BOOST_CHECK_EQUAL( "", serial.getMessage() );
-}
-
-BOOST_AUTO_TEST_CASE( mockSendAndReceive )
-{
-    MockSerial serialMock;
-    serialMock.sendMessage("melding");
-    BOOST_CHECK_EQUAL("melding", serialMock.getMessage());
-}
-BOOST_AUTO_TEST_SUITE_END(); //MOCK_serial_communication
-
-BOOST_AUTO_TEST_SUITE(serial_communication_with_tempfile);
-BOOST_AUTO_TEST_CASE( writeToTempfile )
-{
-    system("touch ./tempFile.log");
-    FileSerial serialInterface("./tempFile.log");
-    std::string sendtStreng = "ASDFqwer1234";
-    serialInterface.sendMessage(sendtStreng);
-    usleep(100);
-    std::ifstream fileInput("./tempFile.log");
-    std::string lestTekststreng;
-    std::getline(fileInput, lestTekststreng);
-    BOOST_CHECK_EQUAL(sendtStreng, lestTekststreng);
-    //system("rm ./tempFile.log");
-}
+BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
 bool fileExists(const std::string& filePath)
 {
     if (FILE *file = fopen(filePath.c_str(), "r")) {
@@ -55,31 +27,75 @@ bool fileExists(const std::string& filePath)
 }
 BOOST_AUTO_TEST_CASE( SerialPortsExcists )
 {
-    BOOST_REQUIRE( fileExists(SERIAL_PORT_DUMMY_IN ) ); 
-    BOOST_REQUIRE( fileExists(SERIAL_PORT_DUMMY_OUT ) ); 
+    BOOST_REQUIRE( fileExists(PATH_VIRTUAL_SERIAL_PORT_INPUT) ); 
+    BOOST_REQUIRE( fileExists(PATH_VIRTUAL_SERIAL_PORT_OUTPUT) ); 
 }
 
 BOOST_AUTO_TEST_CASE( ConstructSerialObject )
 {
     boost::system::error_code ec;
-    Serial testObj(SERIAL_PORT_DUMMY_OUT, 9600, &ec);
+    Serial testObj(PATH_VIRTUAL_SERIAL_PORT_OUTPUT, 9600, &ec);
 
-    // TODO Bare test om objektet eksisterer.. Test også om ec har verdi
+    // Bare test om objektet eksisterer: check ec for feil..
     BOOST_CHECK_MESSAGE( !ec, "Construction of serial object gave error message" <<ec.message().c_str() );
-    if (ec) { std::cout<<"TEST: get_option failed with message: " <<ec.message().c_str() <<std::endl; }
 }
 
-/*
- * BOOST_AUTO_TEST_CASE( VerifyVirtualSerialPortOperation )
+BOOST_AUTO_TEST_CASE( serial_read_test_if_virtual_serial_port_works )
 {
-    std::string filepathSerial1 = "/dev/pts/3";
-    std::string filepathSerial2 = "/dev/pts/4";
-    //BOOST_CHECK(fileExists(filepathSerial1) && fileExists(filepathSerial2));
-    std::cout<<"ctor kalles med arg: " <<filepathSerial1 <<", 96000\n";
-    Serial port1{filepathSerial1, 96000};
-    //Serial port2{"./VirtualSerialPortOut", 96000};
-     
-}*/
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT); 
+    std::string testString = "asdfqwer1234æøå";
+    std::string cmdString = "echo '" + testString + "' > " + PATH_VIRTUAL_SERIAL_PORT_INPUT;
+    system(cmdString.c_str());
+    std::string readString;
+    receivePort.read(&readString);
+    BOOST_CHECK_EQUAL(readString, testString);   
+}
+
+std::string exec(const char* cmd) {
+    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while (!feof(pipe.get())) {
+        if (fgets(buffer, 128, pipe.get()) != NULL) {
+            result += buffer;
+        }
+    }
+    // remove last char (this is always(?) an extra '\n' from BASH cmd return).
+    result.erase(result.size()-1);
+    return result;
+}
+
+BOOST_AUTO_TEST_CASE( serial_write_test )
+{
+    Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    std::string testString = "asdfqwer1234";
+    std::string cmdString = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_OUTPUT;
+        // Command reads last line in path
+    sendPort.write(testString);
+
+    std::cout<<"exec(" <<cmdString <<")\n";
+    std::string returnFromShell = exec(cmdString.c_str());
+    std::cout<<"[[[" <<testString <<"]]] og [[[" <<returnFromShell <<"]]]\n";
+
+    BOOST_CHECK_EQUAL(returnFromShell, testString);
+}
+
+#if 0
+BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
+{
+    Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+
+    std::string testString = "asdfqwer1234æøå";
+    std::string stringRead = "";
+    sendPort.write(testString);
+    receivePort.read(&stringRead);
+    BOOST_CHECK(testString, stringRead);
+}
+#endif
+
+
 
 
 
