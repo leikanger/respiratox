@@ -17,7 +17,7 @@ public:
 /************/
 class Serial {
 public:
-    Serial(const std::string& port, unsigned int baud_rate);
+    Serial(const std::string& port, unsigned int baud_rate, boost::system::error_code* pec =nullptr);
     ~Serial();
 
     bool read(std::string* pTextBuffer);

@@ -9,6 +9,12 @@ using std::cout;
 //namespace utf = boost::unit_test;
 namespace bASIO = boost::asio;
 
+// The following serial ports are crated with [socat] shell command, and is
+// used for dummy-testing in TDD.
+static const std::string SERIAL_PORT_DUMMY_IN = "/dev/pts/4";
+static const std::string SERIAL_PORT_DUMMY_OUT= "/dev/pts/3";
+
+
 BOOST_AUTO_TEST_SUITE(MOCK_serial_communication);
 BOOST_AUTO_TEST_CASE( constructing )
 {
@@ -47,30 +53,22 @@ bool fileExists(const std::string& filePath)
         return false; 
     }
 }
+BOOST_AUTO_TEST_CASE( SerialPortsExcists )
+{
+    BOOST_REQUIRE( fileExists(SERIAL_PORT_DUMMY_IN ) ); 
+    BOOST_REQUIRE( fileExists(SERIAL_PORT_DUMMY_OUT ) ); 
+}
+
 BOOST_AUTO_TEST_CASE( ConstructSerialObject )
 {
-    std::string path = "/dev/pts/0";
-    Serial testObj(path, 9600);
     boost::system::error_code ec;
+    Serial testObj(SERIAL_PORT_DUMMY_OUT, 9600, &ec);
 
-    // XXX En variant: forsøk å skrive (og gå ut fra at den gir feilmelding
-    // dersom det ikkje går gjennom, eller obj ikkje er konstruert)
-    // XXX En variant: å lese ut en option fra porten.
-//    bASIO::get_option(boost::asio::serial_port_base::baud_rate(baudRateArg), ec);
+    // TODO Bare test om objektet eksisterer.. Test også om ec har verdi
+    BOOST_CHECK_MESSAGE( !ec, "Construction of serial object gave error message" <<ec.message().c_str() );
     if (ec) { std::cout<<"TEST: get_option failed with message: " <<ec.message().c_str() <<std::endl; }
 }
-BOOST_AUTO_TEST_CASE( ReadFromArduino )
-{
-    // MERK: dersom man sender ' ' (space) inn i arduino-monitoren, får man
-    // ikkje med dei to første characters. Dette gir ønske om å teste for
-    // start-character også (i read-funksjonen)!
-    std::string path = "/dev/pts/3";
-    Serial testObj(path, 9600);
-    cout<<"Fekk åpna path " <<path <<std::endl;
-    std::string lestStreng;
-    BOOST_CHECK( testObj.read(&lestStreng) );   // returnerer false ved feil.
-    std::cout<<"HURRA: Eg har lest : [[[" <<lestStreng <<"]]]\n";
-}
+
 /*
  * BOOST_AUTO_TEST_CASE( VerifyVirtualSerialPortOperation )
 {
@@ -83,12 +81,29 @@ BOOST_AUTO_TEST_CASE( ReadFromArduino )
      
 }*/
 
-BOOST_AUTO_TEST_CASE( writeToLiveDevFile )
+
+
+#if 0
+BOOST_TEST_CASE( ReadFromArduino )
+{
+    // MERK: dersom man sender ' ' (space) inn i arduino-monitoren, får man
+    // ikkje med dei to første characters. Dette gir ønske om å teste for
+    // start-character også (i read-funksjonen)!
+    std::string path = "/dev/ttyACM0"; // Eller noke i den duren
+    BOOST_REQUIRE( fileExists(path) );
+    Serial testObj(path, 9600);
+    std::string lestStreng;
+    BOOST_CHECK( testObj.read(&lestStreng) );   // returnerer false ved feil.
+    std::cout<<"HURRA: Eg har lest : [[[" <<lestStreng <<"]]]\n";
+}
+
+BOOST_TEST_CASE( writeToLiveDevFile )
 {
     // TODO: neste setning har ingen tester, og er dårlig..
     FileSerial liveTest("/dev/ttyACM1");
     liveTest.sendMessage("LIVE");
 }
+#endif
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
 

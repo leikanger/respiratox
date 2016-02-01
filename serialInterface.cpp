@@ -13,23 +13,31 @@ namespace bASIO=boost::asio;
  * \throws boost::system::system_error if cannot open the
  * serial device
 **/
-Serial::Serial(const std::string& portPath, unsigned int baudRateArg)
+Serial::Serial(const std::string& portPath, unsigned int baudRateArg, boost::system::error_code* pec /*==null_ptr*/)
     : io(), serialPort(io)//serialPort(io, port)
 {
     std::cout<<"Constructing Serial object with path: " <<portPath <<" baud_rate: " <<baudRateArg <<"\n";
-    boost::system::error_code ec;
-    serialPort.open(portPath, ec);
-    if (ec) {
+    
+    // For default argument *pec = 0 (no bs::error_code supplied), create
+    // error code-dummy and take dummy's address:
+    using BSerror_code = boost::system::error_code;
+    BSerror_code dummyEC;
+    if (pec == nullptr) { // erroc_code address supplied = 0 -- create local error-code obj.
+        pec = &dummyEC;
+    }
+    serialPort.open(portPath, *pec);
+    if (*pec) {
         std::cout<<"error : serialPort.open(" <<portPath <<",ec) reported error ec=" 
-            <<ec.message().c_str() <<std::endl;
+            <<pec->message().c_str() <<std::endl;
         // terminate!! 
-        exit(0);
+        exit(0); // TODO return direkte herifra: Husk at ec--som-er-en-ref-variabel-- blir satt ved feil!! 
+        // Kan sjekkes utafor!!!
     }
 
-    serialPort.set_option( boost::asio::serial_port_base::baud_rate(baudRateArg), ec);
-    if (ec) {
+    serialPort.set_option( boost::asio::serial_port_base::baud_rate(baudRateArg), *pec);
+    if (*pec) {
         std::cout<<"error : serialPort set baud_rate faila : reported error ec=" 
-            <<ec.message().c_str() <<std::endl;
+            <<pec->message().c_str() <<std::endl;
         // terminate!! 
         exit(0);
     }
