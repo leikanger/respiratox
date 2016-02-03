@@ -11,8 +11,8 @@ namespace bASIO = boost::asio;
 
 // The following serial ports are crated with [socat] shell command, and is
 // used for dummy-testing in TDD.
-static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "/dev/pts/3";
-static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/4";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "/dev/pts/9";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/11";
 
 
 BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE( serial_write_test )
         // Command reads last line in path
     sendPort.write(testString);
 
-    std::cout<<"exec(" <<cmdString <<")\n";
+    std::cout<<"Mottak: exec(" <<cmdString <<")\n";
     std::string returnFromShell = exec(cmdString.c_str());
     std::cout<<"[[[" <<testString <<"]]] og [[[" <<returnFromShell <<"]]]\n";
 

@@ -1,4 +1,4 @@
-CC=g++
+CC=clang++
 CFLAGS=-std=c++11 -Wall -lpthread
 LIBR=-lboost_system -lboost_thread
 

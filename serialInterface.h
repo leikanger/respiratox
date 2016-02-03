@@ -23,9 +23,9 @@ public:
     bool read(std::string* pTextBuffer);
     bool write(const std::string& pTextBuffer);
 private:
-
     boost::asio::io_service io;
     boost::asio::serial_port serialPort;
+    const std::string serialPortPath;
 };
 
 

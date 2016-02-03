@@ -16,7 +16,7 @@ namespace bASIO=boost::asio;
 Serial::Serial( const std::string& portPath,
                 unsigned int baudRateArg /*=9600*/,
                 boost::system::error_code* pec /*==null_ptr*/)
-    : io(), serialPort(io)//serialPort(io, port)
+    : io(), serialPort(io), serialPortPath(portPath)
 {
     std::cout<<"Constructing Serial object with path: " <<portPath <<" baud_rate: " <<baudRateArg <<"\n";
     
@@ -60,6 +60,13 @@ Serial::~Serial()
  */
 bool Serial::read(std::string* pTekstBuffer)
 {
+  /* Effektivisere, når alt funker:
+   *    Alternativ 1: XXX Strategi: Les inn fleire tegn (type:20 chars), og leit etter '\n' i 
+   * denne sekvensen. Når det finnes, klargjør returverdi med det som er før (sammen med en static buffer
+   * variabel), og lagre det som er etter '\n' i den samme buffervariabel (for neste melding).
+   *    Alternativ 2: XXX Statisk lengde på signalet: dette gjør at vi kan lese ut denne lengden
+   * med asio.read -- det negative er at dette kanskje går på bekostning av sikkerhet?
+   */
     const char MESSAGE_SEPARATOR = '\n';
     static char nextChar;
     *pTekstBuffer = "";
@@ -91,10 +98,13 @@ bool Serial::read(std::string* pTekstBuffer)
 bool Serial::write(const std::string& pTextBuffer)
 {
     /* THE FOLLLOWING IS ONLY FOR TEST SETUP THAT THE TESTS WORKS..
-     /* std::string cmdString = "echo '" + pTextBuffer +"' > " + "/dev/pts/3\n";
+     / * std::string cmdString = "echo '" + pTextBuffer +"' > " + "/dev/pts/3\n";
       return !system(cmdString.c_str());
      */
-    std::cout<<"Eternal hangup -- continue here, serialInterface.cpp l. 97\n";
+    //serialPort.write( Skriv bekskjeden til seriellporten )
+    std::cout<<"KORTSLUTTE TEST: SKRIV FØLGANDE I ANNEN TERMINAL: echo 'asdfqwer1234' > " <<serialPortPath <<"\n";
+    std::cout<<"continue here, serialInterface.cpp l. 97\n";
+    return 0;
 }
 /*
 bool Serial::sendMessage(const std::string& tekst) const
