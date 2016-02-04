@@ -73,7 +73,8 @@ BOOST_AUTO_TEST_CASE( serial_write )
     std::string testString = "asdfqwer1234";
     std::string cmdString = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_OUTPUT;
         // Command reads last line in path (without '\n' on end)
-    sendPort.write(testString);
+    sendPort.write_message(testString);
+    usleep(1000);
 
     std::cout<<"Mottak: exec(" <<cmdString <<")\n";
     std::string returnFromShell = exec(cmdString.c_str());

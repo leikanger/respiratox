@@ -49,6 +49,7 @@ Serial::~Serial()
     serialPort.close(); 
 }
 
+// TODO: Gå vekk fra bool return value -> heller hold standard linux return value : int (med feilkode = !0)
 /**********************************
  * Serial::read(sting&, unsigned) *
  *  - reads out string of chars untill MESSAGE_SEPARATOR character
@@ -58,7 +59,7 @@ Serial::~Serial()
  *  and continue where it left off last time -- and read in data in batches.
  *  Better for efficiency (but don't start with optimalization!)
  */
-bool Serial::read(std::string* pTekstBuffer)
+int Serial::read(std::string* pTekstBuffer)
 {
   /* Effektivisere, når alt funker:
    *    Alternativ 1: XXX Strategi: Les inn fleire tegn (type:20 chars), og leit etter '\n' i 
@@ -84,27 +85,29 @@ bool Serial::read(std::string* pTekstBuffer)
             <<ec.message().c_str() <<std::endl;
         // terminate!! 
         exit(0);
-        return false;
+        return -1;
     }
 
     if (nextChar != '\n') {
 		// it must have timed out.
-        return false;
+        return -2;
 		//throw std::exception("Read timed out!");
-	}
-    return true;
-}
-
-bool Serial::write(const std::string& pTextBuffer)
-{
-    /* THE FOLLLOWING IS ONLY FOR TEST SETUP THAT THE TESTS WORKS..
-     / * std::string cmdString = "echo '" + pTextBuffer +"' > " + "/dev/pts/3\n";
-      return !system(cmdString.c_str());
-     */
-    //serialPort.write( Skriv bekskjeden til seriellporten )
-    std::cout<<"KORTSLUTTE TEST: SKRIV FØLGANDE I ANNEN TERMINAL: echo 'asdfqwer1234' > " <<serialPortPath <<"\n";
-    std::cout<<"continue here, serialInterface.cpp l. 97\n";
+	  }
     return 0;
+}
+/* important: messages are separated by the '\n' sign */
+int Serial::write_message(std::string pTextBuffer)
+{
+    pTextBuffer += '\n';
+    return write_some(pTextBuffer.c_str(), pTextBuffer.size());
+}
+int Serial::write_some(const char* buf, const int size)
+{
+   boost::system::error_code ec;
+   if (!serialPort.is_open()) return -1;
+   if (size == 0) return 0;
+
+   return serialPort.write_some(boost::asio::buffer(buf, size), ec);
 }
 /*
 bool Serial::sendMessage(const std::string& tekst) const

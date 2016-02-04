@@ -20,9 +20,10 @@ public:
     Serial(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
     ~Serial();
 
-    bool read(std::string* pTextBuffer);
-    bool write(const std::string& pTextBuffer);
+    int read(std::string* pTextBuffer);
+    int write_message(std::string pTextBuffer);
 private:
+    int write_some(const char* buf, const int size);
     boost::asio::io_service io;
     boost::asio::serial_port serialPort;
     const std::string serialPortPath;
