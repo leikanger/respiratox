@@ -30,7 +30,6 @@ BOOST_AUTO_TEST_CASE( SerialPortsExcists )
     BOOST_REQUIRE( fileExists(PATH_VIRTUAL_SERIAL_PORT_INPUT) ); 
     BOOST_REQUIRE( fileExists(PATH_VIRTUAL_SERIAL_PORT_OUTPUT) ); 
 }
-
 BOOST_AUTO_TEST_CASE( ConstructSerialObject )
 {
     boost::system::error_code ec;
@@ -39,18 +38,21 @@ BOOST_AUTO_TEST_CASE( ConstructSerialObject )
     // Bare test om objektet eksisterer: check ec for feil..
     BOOST_CHECK_MESSAGE( !ec, "Construction of serial object gave error message" <<ec.message().c_str() );
 }
-
-BOOST_AUTO_TEST_CASE( serial_read_test_if_virtual_serial_port_works )
+void writeStringToFilepath(const std::string& argString, const std::string& argPath)
+{
+    std::string cmdString = "echo '" + argString + "' > " + argPath;
+    system(cmdString.c_str());
+}
+BOOST_AUTO_TEST_CASE( serial_read )
 {
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT); 
     std::string testString = "asdfqwer1234æøå";
-    std::string cmdString = "echo '" + testString + "' > " + PATH_VIRTUAL_SERIAL_PORT_INPUT;
-    system(cmdString.c_str());
-    std::string readString;
-    receivePort.read(&readString);
-    BOOST_CHECK_EQUAL(readString, testString);   
-}
+    std::string readBuffer;
 
+    writeStringToFilepath(testString, PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    receivePort.read(&readBuffer);
+    BOOST_CHECK_EQUAL(readBuffer, testString);   
+}
 std::string exec(const char* cmd) {
     std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
     if (!pipe) return "ERROR";
@@ -65,13 +67,12 @@ std::string exec(const char* cmd) {
     result.erase(result.size()-1);
     return result;
 }
-
-BOOST_AUTO_TEST_CASE( serial_write_test )
+BOOST_AUTO_TEST_CASE( serial_write )
 {
     Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_INPUT);
     std::string testString = "asdfqwer1234";
     std::string cmdString = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_OUTPUT;
-        // Command reads last line in path
+        // Command reads last line in path (without '\n' on end)
     sendPort.write(testString);
 
     std::cout<<"Mottak: exec(" <<cmdString <<")\n";
@@ -94,10 +95,6 @@ BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
     BOOST_CHECK(testString, stringRead);
 }
 #endif
-
-
-
-
 
 #if 0
 BOOST_TEST_CASE( ReadFromArduino )
