@@ -18,7 +18,7 @@ Serial::Serial( const std::string& portPath,
                 boost::system::error_code* pec /*==null_ptr*/)
     : io(), serialPort(io), serialPortPath(portPath)
 {
-    std::cout<<"Constructing Serial object with path: " <<portPath <<" baud_rate: " <<baudRateArg <<"\n";
+    //std::cout<<"Constructing Serial object with path: " <<portPath <<" baud_rate: " <<baudRateArg <<"\n";
     
     // For default argument *pec = 0 (no bs::error_code supplied), create
     // error code-dummy and take dummy's address:

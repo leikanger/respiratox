@@ -76,14 +76,11 @@ BOOST_AUTO_TEST_CASE( serial_write )
     sendPort.write_message(testString);
     usleep(1000);
 
-    std::cout<<"Mottak: exec(" <<cmdString <<")\n";
     std::string returnFromShell = exec(cmdString.c_str());
-    std::cout<<"[[[" <<testString <<"]]] og [[[" <<returnFromShell <<"]]]\n";
 
     BOOST_CHECK_EQUAL(returnFromShell, testString);
 }
 
-#if 0
 BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
 {
     Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_INPUT);
@@ -91,11 +88,10 @@ BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
 
     std::string testString = "asdfqwer1234æøå";
     std::string stringRead = "";
-    sendPort.write(testString);
+    sendPort.write_message(testString);
     receivePort.read(&stringRead);
-    BOOST_CHECK(testString, stringRead);
+    BOOST_CHECK_EQUAL(testString, stringRead);
 }
-#endif
 
 #if 0
 BOOST_TEST_CASE( ReadFromArduino )
@@ -109,13 +105,6 @@ BOOST_TEST_CASE( ReadFromArduino )
     std::string lestStreng;
     BOOST_CHECK( testObj.read(&lestStreng) );   // returnerer false ved feil.
     std::cout<<"HURRA: Eg har lest : [[[" <<lestStreng <<"]]]\n";
-}
-
-BOOST_TEST_CASE( writeToLiveDevFile )
-{
-    // TODO: neste setning har ingen tester, og er dårlig..
-    FileSerial liveTest("/dev/ttyACM1");
-    liveTest.sendMessage("LIVE");
 }
 #endif
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
@@ -134,13 +123,3 @@ BOOST_AUTO_TEST_SUITE_END();
 // TODO hugs å finne/respondere for exception ved feil filepath! TODO Ved
 // construction av Serial object!
 // TODO
-
-/*
-BOOST_AUTO_TEST_CASE( Serial_send_and_receive )
-{
-    Serial mockInterface("./slettTEST");
-    mockInterface.sendMessage("asdf");
-    Serial mockReadInterface("./slettTEST");
-    BOOST_CHECK_EQUAL("asdf", mockReadInterface.getMessage());
-}
-*/

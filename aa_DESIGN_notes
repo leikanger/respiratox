@@ -1,5 +1,4 @@
 PLAN: DATAINNSAMLING: ===========================================================================================
-<<<<<<< HEAD
 
   plan 1: Arduino, asio - hente ut data fra arduino, sende over seriellport.
     FORDELER: 
@@ -36,54 +35,11 @@ PLAN: MOTTAK AV DATA: ==========================================================
       - ikkje så drivende motivert som ved C++
       - lang fra ferdig produksjonssystem
 
-
-=======
-
-  plan 1: Arduino, asio - hente ut data fra arduino, sende over seriellport.
-    FORDELER: 
-      - nærare produksjon - muligens direkte overførbart til produserbart system
-      - 
-    ULEMPER
-      - Kan være at det tar lenger tid å utvikle enn for rasberry pi eller BBB
-
-  plan 2: rasberry pi eller BBB
-    FORDELER: 
-      - muligens enkelt å hente ut data (få dataset fort)
-      - fullverdig linux distro inni, med alt dette innebærer. Mini-pc
-    ULEMPER:
-      - langt fra produksjonssystem, vil ikkje være overførbart til produserbar sensor.
-  
-  
-PLAN: MOTTAK AV DATA: ============================================================================================
-  plan 1: C++, BOOST.asio, linux   - mottak av data ved BOOST.asio - det er rimelig enkelt å bytte ut 
-    FORDELER:
-      - eg får opplæring i BOOST.asio, som kan brukast til såmangt seinare.
-      - eg er motivert for å jobbe med dette!
-      - har allerede stor kjennskap til språket.
-    ULEMPER:
-      - lite egnet for liveplotting av data. Kanskje man må bruke støtte i python for å få plotta? Kanskje ikkje live?
-        * men dette er kanskje ikkje så viktig?
-      - GUI - ikkje egnet til GUI (med unntak av gjennom Qt).
-
-  plan 2: Python
-    FORDELER:
-      - raskt å utvikle, kan plotte direkte, veldig egnet for prototyping
-      - 
-    ULEMPER
-      - må sette meg inn i alt som har med seriell utlesing osv. på nytt.
-      - ikkje så drivende motivert som ved C++
-      - lang fra ferdig produksjonssystem
-
-
->>>>>>> 394783929f5024941422307b40ba0a7c26968d90
 
 Eg tenker at bege planer er gode planer, avhengig av kva hovudfokus skal være. Eg trur kanskje at prosjektet er todelt
 og at eg med plan 1 samler de to fasene : at koden fra prototype-fasen kan brukes vidare i produksjonsfasen. Dessuten
 får eg fordypa meg i BOOST.asio .  Høgt fokus på TDD/unit testing gjør at koden kan brukes vidare også!
-<<<<<<< HEAD
 
 
 PLAN:
 Test boost::asio::read_untill() -- som kan lese inntill en-eller-anna-delimiter - f.eks \n.. Sjekk dette ved å sende fleire enkeltkarakterer: echo -n "j" ... til .. echo "" (med linjeskift)
-=======
->>>>>>> 394783929f5024941422307b40ba0a7c26968d90

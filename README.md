@@ -1,2 +1,2 @@
 # respiratox
-Desktop client for plotting data from respiratox measurements.
+Desktop client for receiving data from RespirationRate measurements.
