@@ -1,1 +1,1 @@
-vim -p serialInterfaceTEST.cpp serialInterface.cpp serialInterface.h Makefile
+vim -p serialInterfaceTEST.cpp pathToVirtualSerialPorts.h serialInterface.cpp serialInterface.h Makefile

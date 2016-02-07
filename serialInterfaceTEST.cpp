@@ -5,15 +5,19 @@
 
 #include "serialInterface.h"
 
-using std::cout;
-//namespace utf = boost::unit_test;
-namespace bASIO = boost::asio;
-
+#if 0
 // The following serial ports are crated with [socat] shell command, and is
 // used for dummy-testing in TDD.
 static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "/dev/pts/9";
 static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/11";
+#endif
+// The two paths are extracted to the following includefile, for convenience..
+#include "pathToVirtualSerialPorts.h"
 
+
+using std::cout;
+//namespace utf = boost::unit_test;
+namespace bASIO = boost::asio;
 
 BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
 bool fileExists(const std::string& filePath)
