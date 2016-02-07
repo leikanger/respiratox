@@ -21,8 +21,11 @@ TDD - Test Plan
 More detailed than the above req.spec., and also a plan for unit tests and
 code development (TDD). 
 
+TDD - Test Plan
+================================================
+
 ASIO and core functionality
----------------------------
+------------------------------------------------
 ### Construction and destruction
     * Verify serial path / system path to serial interface
     * Constructor
