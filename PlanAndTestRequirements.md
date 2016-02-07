@@ -14,21 +14,19 @@ Able to receive messages with accelerometer data
 The network protocol is undecided
 ------------------------------------------------
 This focus on having clear separation between code and signal protocol:
-remember interface and dependency inversion principle..
+remember to have a strong focus on interface and dependency inversion principle..
 
 TDD - Test Plan
 ================================================
 More detailed than the above req.spec., and also a plan for unit tests and
 code development (TDD). 
 
-TDD - Test Plan
-================================================
-
 ASIO and core functionality
-------------------------------------------------
+---------------------------
 ### Construction and destruction
     * Verify serial path / system path to serial interface
     * Constructor
+        - empties serial buffer
 ### Core functionality
     * Receive data -- echo message > [outserial-system-filepath-path]
         and receive through serial interface.
