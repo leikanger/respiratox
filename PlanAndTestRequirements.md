@@ -26,7 +26,7 @@ ASIO and core functionality
 ### Construction and destruction
     * Verify serial path / system path to serial interface
     * Constructor
-        - empties serial buffer
+    * Test for vitual serial ports: verify empty buffer..
 ### Core functionality
     * Receive data -- echo message > [outserial-system-filepath-path]
         and receive through serial interface.
