@@ -24,16 +24,19 @@ code development (TDD).
 ASIO and core functionality
 ---------------------------
 ### Construction and destruction
-    * Verify serial path / system path to serial interface
-    * Constructor
-    * Test for vitual serial ports: verify empty buffer..
+    * X Verify serial path / system path to serial interface
+    * X Constructor
+    * X Test for vitual serial ports: verify empty buffer..
 ### Core functionality
-    * Receive data -- echo message > [outserial-system-filepath-path]
+    * X Receive data -- echo message > [outserial-system-filepath-path]
         and receive through serial interface.
-    * Send data -- verify with 'head -1 /dev/pts/RECEIVE_PATH'
-    * Send and receive from objects from class Serial => right message recievd
+    * X Send data -- verify with 'head -1 /dev/pts/RECEIVE_PATH'
+    * X Send and receive from objects from class Serial => right message recievd
     * When two messages comes right after eachother, both are correctly received
-    * 
+### Sensor-Dummy
+    * Create Test-dummy for sending and also documenting how arduino should
+        behave
+    * Develop decoding
 
 Decoding message and saving result
 ------------------------------------------------
