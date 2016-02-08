@@ -3,6 +3,9 @@
 #include <boost/test/unit_test.hpp>
 #include <cstdlib>
 
+#include <thread>
+#include <chrono>
+
 #include "serialInterface.h"
 
 #if 0
@@ -19,7 +22,49 @@ using std::cout;
 //namespace utf = boost::unit_test;
 namespace bASIO = boost::asio;
 
+// FUCK: I can not manage to capture class variables in lambda expression for thread!!!
+struct ArduinoMOCK {
+    Serial serialPort; 
+    bool bContinueExecution;
+    // JEJE, I know: I don't want "raw" pointer -- but I am only testing right now.. UNTILL IT WORKS:
+    std::thread *runThread;
+
+    ArduinoMOCK() 
+      : serialPort(PATH_VIRTUAL_SERIAL_PORT_INPUT) 
+      , bContinueExecution{true}
+      //, runThread([this](){ std::cout<<"lambda bool: " <<bContinueExecution <<"\n"; run(); } )
+    { cout<<"BOOL inne i ctor: " <<bContinueExecution <<"\n"; 
+      bool bool2 = bContinueExecution;
+      runThread = new std::thread([&,this]() { std::cout<<"lambda bool: " <<this->bContinueExecution <<" og ikkje-class-v " <<bool2 <<"\n"; } ) ;
+      //XXX WTF! this->bContinueExecution != bool2 !!!
+    }
+
+    ~ArduinoMOCK()
+    {
+        bContinueExecution = false;
+        runThread->join();
+        delete runThread;
+    }
+
+    void run()
+    {
+        std::cout<<"bContinueExecution = " <<bContinueExecution <<"\n";
+        while (bContinueExecution) std::cout<<".";
+    }
+
+};
+
+
+
 BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
+BOOST_AUTO_TEST_CASE( thread_test )
+{
+   using std::chrono::seconds;
+   ArduinoMOCK();
+   std::this_thread::sleep_for(seconds(1));
+   std::cout<<"ferdig\n";
+}
+
 bool fileExists(const std::string& filePath)
 {
     if (FILE *file = fopen(filePath.c_str(), "r")) {
