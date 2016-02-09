@@ -1,15 +1,3 @@
-#define BOOST_TEST_MODULE serial_communication
-#define BOOST_TEST_DYN_LINK
-#include <boost/test/unit_test.hpp>
-#include <cstdlib>
-
-#include <thread>
-#include <chrono>
-
-#include "serialInterface.h"
-
-// The two paths are extracted to the following includefile, for convenience..
-#include "pathToVirtualSerialPorts.h"
 #include "serialInterfaceTEST.h"
 
 
@@ -36,6 +24,11 @@ BOOST_AUTO_TEST_CASE( construct_Serial_object )
 }
 BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )
 {
+    TEST::emptySerialOutputBuffer();
+    // Now, the rest of this test should  be redundant..
+
+
+
     // Write an empty string to ports, to clear last line but also to certify
     // return from head -1 command..
     TEST::writeStringToFilepath("", PATH_VIRTUAL_SERIAL_PORT_INPUT);
@@ -101,7 +94,7 @@ BOOST_AUTO_TEST_CASE( thread_test )
 BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
 {
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
-    TEST::ArduinoMOCK test;
+    TEST::ArduinoMOCK test("hell jeah! 234");
     std::string message;
     for( int i : {1,2,3,4,5} ) {
         receivePort.read(&message);
@@ -110,6 +103,23 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
     // Clean up pipe for next test:
     test.stop();
     receivePort.read(&message);
+}
+BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
+{
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    TEST::writeStringToFilepath("111.11\t222\t3.3333",PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    std::vector<double> result = receivePort.getNextValueVector();
+    BOOST_CHECK_EQUAL(result.size(), 3);
+}
+BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
+{
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    TEST::writeStringToFilepath("111.11\t222\t3.3333",PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    std::vector<double> result = receivePort.getNextValueVector();
+
+    BOOST_CHECK_EQUAL(result[0], 111.11);
+    BOOST_CHECK_EQUAL(result[1], 222);
+    BOOST_CHECK_EQUAL(result[2], 3.3333);
 }
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 

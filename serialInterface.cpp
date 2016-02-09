@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <exception>
+#include <boost/lexical_cast.hpp>
 
 namespace bASIO=boost::asio;
 
@@ -47,6 +48,25 @@ Serial::Serial( const std::string& portPath,
 Serial::~Serial()
 {
     serialPort.close(); 
+}
+
+std::vector<double> Serial::getNextValueVector()
+{
+    using std::string;
+    const char VALUE_SEPARATOR = '\t';
+    std::vector<double> returnValues;
+    
+    std::string buffer;
+    read(&buffer);
+    string::size_type nextMark = 0;
+    // TODO Legg inn feilsjekking mot at vi går utafor bufferlengda!!! TODO
+    for (int i = 0; i<3; ++i) {
+        nextMark = buffer.find(VALUE_SEPARATOR);
+        returnValues.push_back(boost::lexical_cast<double>(buffer.substr(0,nextMark)));
+        buffer = buffer.substr(nextMark+1);
+    }
+
+    return returnValues;
 }
 
 // TODO: Gå vekk fra bool return value -> heller hold standard linux return value : int (med feilkode = !0)

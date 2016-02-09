@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/asio.hpp>
+#include <vector>
 
 #ifndef SERIALINTERFACE_H
 #define SERIALINTERFACE_H
@@ -22,6 +23,7 @@ public:
 
     int read(std::string* pTextBuffer);
     int write_message(std::string pTextBuffer);
+    std::vector<double> getNextValueVector();
 private:
     int write_some(const char* buf, const int size);
     boost::asio::io_service io;

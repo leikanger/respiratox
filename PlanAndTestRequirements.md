@@ -40,8 +40,8 @@ ASIO and core functionality
     * - Stress test for multiple messages in close succession
 ### Decoding messages
     * X Messages are separated by \n
+    * X Correct message decoding: One message gives three numbers
     * - Values for different axes are separated by \t
-    * - Correct message decoding: One message gives three numbers
     * - Correct value: X Correct decoding for one value (eg. X axis)
     * - Correct values: X,Y,Z 
     * - Correct decoding: 0 and 0.0
