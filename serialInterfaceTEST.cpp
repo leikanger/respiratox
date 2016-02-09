@@ -8,12 +8,6 @@
 
 #include "serialInterface.h"
 
-#if 0
-// The following serial ports are crated with [socat] shell command, and is
-// used for dummy-testing in TDD.
-static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "/dev/pts/9";
-static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/11";
-#endif
 // The two paths are extracted to the following includefile, for convenience..
 #include "pathToVirtualSerialPorts.h"
 
@@ -22,48 +16,42 @@ using std::cout;
 //namespace utf = boost::unit_test;
 namespace bASIO = boost::asio;
 
-// FUCK: I can not manage to capture class variables in lambda expression for thread!!!
 struct ArduinoMOCK {
     Serial serialPort; 
     bool bContinueExecution;
-    // JEJE, I know: I don't want "raw" pointer -- but I am only testing right now.. UNTILL IT WORKS:
-    std::thread *runThread;
+    std::thread mThread;
 
     ArduinoMOCK() 
       : serialPort(PATH_VIRTUAL_SERIAL_PORT_INPUT) 
       , bContinueExecution{true}
-      //, runThread([this](){ std::cout<<"lambda bool: " <<bContinueExecution <<"\n"; run(); } )
-    { cout<<"BOOL inne i ctor: " <<bContinueExecution <<"\n"; 
-      bool bool2 = bContinueExecution;
-      runThread = new std::thread([&,this]() { std::cout<<"lambda bool: " <<this->bContinueExecution <<" og ikkje-class-v " <<bool2 <<"\n"; } ) ;
-      //XXX WTF! this->bContinueExecution != bool2 !!!
+      //, mThread([](ArduinoMOCK* pThis){ std::cout<<"lambda bool: " <<pThis->bContinueExecution <<"\n"; pThis->run(); } , this)
+    {
+        mThread = std::thread([](ArduinoMOCK* ardMOCKobject) { ardMOCKobject->run(); }, this ) ;
     }
-
     ~ArduinoMOCK()
     {
         bContinueExecution = false;
-        runThread->join();
-        delete runThread;
+        mThread.join();
     }
-
     void run()
     {
-        std::cout<<"bContinueExecution = " <<bContinueExecution <<"\n";
-        while (bContinueExecution) std::cout<<".";
-    }
+        std::string nextMessage = "INIT MESSAGE\n";
+        //while(bContinueExecution) 
+        {
+            nextMessage=getNextMessage();
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
+            cout<<nextMessage <<std::endl;
+            //serialPort.write_message(nextMessage);
+        }
+    }
+    // XXX The next funciton documents how messages shall be written
+    std::string getNextMessage()
+    {
+        return "123.4\t444.44\t13241414.6\n";
+    }
 };
 
-
-
-BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
-BOOST_AUTO_TEST_CASE( thread_test )
-{
-   using std::chrono::seconds;
-   ArduinoMOCK();
-   std::this_thread::sleep_for(seconds(1));
-   std::cout<<"ferdig\n";
-}
 
 bool fileExists(const std::string& filePath)
 {
@@ -93,6 +81,7 @@ std::string exec(const char* cmd) {
     result.erase(result.size()-1);
     return result;
 }
+BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
 BOOST_AUTO_TEST_CASE( serial_port_paths_excist )
 {
     BOOST_REQUIRE( fileExists(PATH_VIRTUAL_SERIAL_PORT_INPUT) ); 
@@ -159,6 +148,17 @@ BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
     receivePort.read(&stringRead);
     BOOST_CHECK_EQUAL(testString, stringRead);
 }
+
+// NEXT: TESTING ArduinoMOCK class.. NOT WORKING TODO
+BOOST_AUTO_TEST_CASE( thread_test )
+{
+   using std::chrono::seconds;
+   ArduinoMOCK test;
+   //test.run();
+   std::this_thread::sleep_for(seconds(1));
+   std::cout<<"ferdig\n";
+}
+
 
 #if 0
 BOOST_TEST_CASE( ReadFromArduino )
