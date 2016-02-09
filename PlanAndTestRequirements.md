@@ -32,11 +32,20 @@ ASIO and core functionality
         and receive through serial interface.
     * X Send data -- verify with 'head -1 /dev/pts/RECEIVE_PATH'
     * X Send and receive from objects from class Serial => right message recievd
-    * When two messages comes right after eachother, both are correctly received
+    * - When two messages comes right after eachother, both are correctly received
 ### Sensor-Dummy
-    * Create Test-dummy for sending and also documenting how arduino should
+    * X Create Test-dummy for sending and also documenting how arduino should
         behave
-    * Develop decoding
+## Receiving messages
+    * - Stress test for multiple messages in close succession
+### Decoding messages
+    * X Messages are separated by \n
+    * - Values for different axes are separated by \t
+    * - Correct message decoding: One message gives three numbers
+    * - Correct value: X Correct decoding for one value (eg. X axis)
+    * - Correct values: X,Y,Z 
+    * - Correct decoding: 0 and 0.0
+    * - Correct decoding: very large numbers
 
 Decoding message and saving result
 ------------------------------------------------
