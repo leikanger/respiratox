@@ -36,19 +36,22 @@ struct ArduinoMOCK {
     void run()
     {
         std::string nextMessage = "INIT MESSAGE\n";
-        //while(bContinueExecution) 
+        cout<<"Messages sent: ";
+        while(bContinueExecution) 
         {
             nextMessage=getNextMessage();
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-            cout<<nextMessage <<std::endl;
-            //serialPort.write_message(nextMessage);
+            // progress bar - show dots for each msg
+            std::cerr<<".";
+            serialPort.write_message(nextMessage);
         }
+        cout<<std::endl;
     }
     // XXX The next funciton documents how messages shall be written
     std::string getNextMessage()
     {
-        return "123.4\t444.44\t13241414.6\n";
+        return "123.4\t444.44\t13241414.6";
     }
 };
 
@@ -81,6 +84,10 @@ std::string exec(const char* cmd) {
     result.erase(result.size()-1);
     return result;
 }
+
+//==============================================================================================
+//======================                TEST                  ==================================
+//==============================================================================================
 BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
 BOOST_AUTO_TEST_CASE( serial_port_paths_excist )
 {
@@ -148,16 +155,30 @@ BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
     receivePort.read(&stringRead);
     BOOST_CHECK_EQUAL(testString, stringRead);
 }
+BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
 // NEXT: TESTING ArduinoMOCK class.. NOT WORKING TODO
+BOOST_AUTO_TEST_SUITE( ArduinoMOCK_for_message_designing );
 BOOST_AUTO_TEST_CASE( thread_test )
 {
    using std::chrono::seconds;
    ArduinoMOCK test;
-   //test.run();
    std::this_thread::sleep_for(seconds(1));
-   std::cout<<"ferdig\n";
+   // Verify that all works as it should with ArduinoMOCK!
 }
+BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
+{
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    ArduinoMOCK test;
+    std::string message;
+    std::cerr<<"\n";
+    for( int i : {1,2,3,4,5} ) {
+        receivePort.read(&message);
+        cout<<i <<"'t message: " <<message <<std::endl;
+    }
+}
+BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
+
 
 
 #if 0
@@ -174,7 +195,6 @@ BOOST_TEST_CASE( ReadFromArduino )
     std::cout<<"HURRA: Eg har lest : [[[" <<lestStreng <<"]]]\n";
 }
 #endif
-BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
 
 
