@@ -28,10 +28,14 @@ struct ArduinoMOCK {
     {
         mThread = std::thread([](ArduinoMOCK* ardMOCKobject) { ardMOCKobject->run(); }, this ) ;
     }
-    ~ArduinoMOCK()
+    ~ArduinoMOCK() {        stop();         }
+
+    void stop()
     {
-        bContinueExecution = false;
-        mThread.join();
+        if (bContinueExecution) {
+            bContinueExecution = false;
+            mThread.join();
+        }
     }
     void run()
     {
@@ -171,11 +175,13 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
     ArduinoMOCK test;
     std::string message;
-    std::cerr<<"\n";
     for( int i : {1,2,3,4,5} ) {
         receivePort.read(&message);
         cout<<i <<"'t message: " <<message <<std::endl;
     }
+    // Clean up pipe for next test:
+    test.stop();
+    receivePort.read(&message);
 }
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
