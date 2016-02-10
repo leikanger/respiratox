@@ -41,14 +41,12 @@ ASIO and core functionality
 ### Decoding messages
     * X Messages are separated by \n
     * X Correct message decoding: One message gives three numbers
-    * - Values for different axes are separated by \t
-    * - Correct value: X Correct decoding for one value (eg. X axis)
-    * - Correct values: X,Y,Z 
-    * - Correct decoding: 0 and 0.0
-    * - Correct decoding: very large numbers
+    * X Values for different axes are separated by \t
+    * X Correct value:  Message gives 3 values for normal messages
+    * - Correck value:  Message also handles short or errorenous messages
+    * X Correct values: X,Y,Z - correct decoding of 3 values
+    * X Strange message or zero does not chrash execution
+    * X Correct decoding: very large numbers
 
 Decoding message and saving result
 ------------------------------------------------
-### Decode message
-    * Message is divided into correct coordinates
-    * 

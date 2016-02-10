@@ -93,19 +93,22 @@ BOOST_AUTO_TEST_CASE( thread_test )
 }
 BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
 {
+    // Empty previous messages through virtual serial port
+    TEST::emptySerialOutputBuffer();
+
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
-    TEST::ArduinoMOCK test("hell jeah! 234");
+    std::string testMelding="Yeah, test message\t12\t34";
+    TEST::ArduinoMOCK test(testMelding);
     std::string message;
     for( int i : {1,2,3,4,5} ) {
         receivePort.read(&message);
-        cout<<i <<"'t message: " <<message <<std::endl;
+        BOOST_CHECK_EQUAL(message, testMelding);
     }
-    // Clean up pipe for next test:
-    test.stop();
-    receivePort.read(&message);
 }
 BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
 {
+    TEST::emptySerialOutputBuffer();
+
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
     TEST::writeStringToFilepath("111.11\t222\t3.3333",PATH_VIRTUAL_SERIAL_PORT_INPUT);
     std::vector<double> result = receivePort.getNextValueVector();
@@ -120,6 +123,31 @@ BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
     BOOST_CHECK_EQUAL(result[0], 111.11);
     BOOST_CHECK_EQUAL(result[1], 222);
     BOOST_CHECK_EQUAL(result[2], 3.3333);
+}
+BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error )
+{
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    TEST::writeStringToFilepath("111.\t.1\t.0",PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    std::vector<double> result = receivePort.getNextValueVector();
+
+    BOOST_CHECK_EQUAL(result[0], 111);
+    BOOST_CHECK_EQUAL(result[1], 0.1);
+    BOOST_CHECK_EQUAL(result[2], 0);
+}
+BOOST_AUTO_TEST_CASE( what_happens_when_only_two_values_are_present )
+{
+    // TODO Develop internal error check that all three variables are
+    // received!
+    //TODO BOOST_ERROR_MESSAGE(false, "make check for what happens when only two values are present(cut message) ? Or is this not impotant?" );
+}
+BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )
+{
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    TEST::writeStringToFilepath("1000000000.\t-1000000000\t0",PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    std::vector<double> result = receivePort.getNextValueVector();
+
+    BOOST_CHECK_EQUAL(result[0], 1000000000);
+    BOOST_CHECK_EQUAL(result[1], -1000000000);
 }
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 

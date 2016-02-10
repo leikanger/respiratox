@@ -28,7 +28,6 @@ namespace TEST{
         {
             // Todo: move into initializer list?
             mThread = std::thread([](ArduinoMOCK* ardMOCKobject) { ardMOCKobject->run(); }, this ) ;
-            std::cout<<constMessage <<std::endl;
         }
         ~ArduinoMOCK() {        stop();         }
     
@@ -57,10 +56,11 @@ namespace TEST{
         // XXX The next funciton documents how messages shall be written
         std::string getNextMessage()
         {
-            if (constMessage == "")
+            if (constMessage == "") {
                 return "123.4\t444.44\t13241414.6";
-            else
+            } else {
                 return constMessage;
+            }
         }
     };
     
@@ -114,9 +114,7 @@ namespace TEST{
         if (0 == ::tcflush(serial_port.lowest_layer().native_handle(), what))
         {
             error = boost::system::error_code();
-        }
-        else
-        {
+        } else {
             error = boost::system::error_code(errno,
                 boost::asio::error::get_system_category());
         }

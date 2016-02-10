@@ -59,7 +59,9 @@ std::vector<double> Serial::getNextValueVector()
     std::string buffer;
     read(&buffer);
     string::size_type nextMark = 0;
-    // TODO Legg inn feilsjekking mot at vi går utafor bufferlengda!!! TODO
+    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
+    // TODO Legg inn feilsjekking mot at vi går utafor bufferlengda!!!   TODO
+    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
     for (int i = 0; i<3; ++i) {
         nextMark = buffer.find(VALUE_SEPARATOR);
         returnValues.push_back(boost::lexical_cast<double>(buffer.substr(0,nextMark)));
