@@ -37,7 +37,7 @@ ASIO and core functionality
     * X Create Test-dummy for sending and also documenting how arduino should
         behave
 ## Receiving messages
-    * - Stress test for multiple messages in close succession
+    * ? Stress test for multiple messages in close succession - [has never failed]
 ### Decoding messages
     * X Messages are separated by \n
     * X Correct message decoding: One message gives three numbers
@@ -47,6 +47,13 @@ ASIO and core functionality
     * X Correct values: X,Y,Z - correct decoding of 3 values
     * X Strange message or zero does not chrash execution
     * X Correct decoding: very large numbers
+### Structuring messages and data structures
+Make a design for saving data in data structures (on heap?), so that e.g. all
+x-values can be taken out. Create design for how to save values.
+    * 
+
+#TODO : Update MOCK objec, so that different messages gives different xvalues e.g.
+
 
 Decoding message and saving result
 ------------------------------------------------

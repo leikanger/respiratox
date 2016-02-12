@@ -105,6 +105,20 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
         BOOST_CHECK_EQUAL(message, testMelding);
     }
 }
+BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
+{
+    std::cout<<"Stress test: ";
+    TEST::emptySerialOutputBuffer();
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    std::string testMelding="Yeah, test message\t12\t34";
+    TEST::ArduinoMOCK test(testMelding, 0);
+    std::string message;
+    for( int i=0; i<100; ++i ) {
+        receivePort.read(&message);
+        BOOST_CHECK_EQUAL(message, testMelding);
+    }
+    // This test is unverified: It has never failed..
+}
 BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
 {
     TEST::emptySerialOutputBuffer();
@@ -124,7 +138,7 @@ BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
     BOOST_CHECK_EQUAL(result[1], 222);
     BOOST_CHECK_EQUAL(result[2], 3.3333);
 }
-BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error )
+BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error__3values )
 {
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
     TEST::writeStringToFilepath("111.\t.1\t.0",PATH_VIRTUAL_SERIAL_PORT_INPUT);

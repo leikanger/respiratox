@@ -19,11 +19,13 @@ namespace TEST{
         bool bContinueExecution;
         std::thread mThread;
         const std::string constMessage;
+        const unsigned int delayBetweenMessagesMs;
     
-        ArduinoMOCK(std::string argConstMessage ="") 
+        ArduinoMOCK(std::string argConstMessage ="", unsigned int argDelayBetweenMessagesMs =200) 
           : serialPort(PATH_VIRTUAL_SERIAL_PORT_INPUT) 
           , bContinueExecution{true}
           , constMessage(argConstMessage)
+          , delayBetweenMessagesMs(argDelayBetweenMessagesMs)
           //, mThread([](ArduinoMOCK* pThis){ std::cout<<"lambda bool: " <<pThis->bContinueExecution <<"\n"; pThis->run(); } , this)
         {
             // Todo: move into initializer list?
@@ -45,7 +47,8 @@ namespace TEST{
             while(bContinueExecution) 
             {
                 nextMessage=getNextMessage();
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                using ms = std::chrono::milliseconds;
+                std::this_thread::sleep_for(ms(delayBetweenMessagesMs));
     
                 // progress bar - show dots for each msg
                 std::cerr<<".";
