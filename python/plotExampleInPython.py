@@ -27,6 +27,7 @@ class AnalogPlot:
 
       self.ax = deque([0.0]*maxLen)
       self.ay = deque([0.0]*maxLen)
+      self.az = deque([0.0]*maxLen)
       self.maxLen = maxLen
 
   # add to buffer
@@ -42,9 +43,10 @@ class AnalogPlot:
       assert(len(data) == 3)
       self.addToBuf(self.ax, data[0])
       self.addToBuf(self.ay, data[1])
+      self.addToBuf(self.az, data[2])
 
   # update plot
-  def update(self, frameNum, a0, a1):
+  def update(self, frameNum, a0, a1, a2):
       try:
           line = self.ser.readline()
           print(line.split())
@@ -56,6 +58,7 @@ class AnalogPlot:
               self.add(data)
               a0.set_data(range(self.maxLen), self.ax)
               a1.set_data(range(self.maxLen), self.ay)
+              a2.set_data(range(self.maxLen), self.az)
       except KeyboardInterrupt:
           print('exiting')
       
@@ -80,22 +83,22 @@ def main():
   print('reading from serial port %s...' % strPort)
 
   # plot parameters
-  analogPlot = AnalogPlot(strPort, 100)
+  analogPlot = AnalogPlot(strPort, MAX_X_VAL)
 
   print('plotting data...')
   # set up animation
   fig = plt.figure()
-  ax = plt.axes(xlim=(0, MAX_X_VAL), ylim=(0, MAX_Y_VAL))
+  ax = plt.axes(xlim=(-0, MAX_X_VAL), ylim=(-MAX_Y_VAL, MAX_Y_VAL))
   a0, = ax.plot([], [])
   a1, = ax.plot([], [])
-  anim = animation.FuncAnimation(fig, analogPlot.update, fargs=(a0, a1), interval=50)
+  a2, = ax.plot([], [])
+  anim = animation.FuncAnimation(fig, analogPlot.update, fargs=(a0, a1, a2), interval=50)
   # show plot
   plt.show()
   # clean up
   analogPlot.close()
 
   print('exiting.')
-  
 
 # call main
 if __name__ == '__main__':
