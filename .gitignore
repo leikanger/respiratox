@@ -10,3 +10,5 @@
 # Helper files (virtual serial ports -- created in test scripts and
 # setUpVirtualSerialPort.sh
 VirtualSerialPort*
+
+python/gammelt
