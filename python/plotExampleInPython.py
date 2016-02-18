@@ -12,6 +12,7 @@ Website: electronut.in
 import sys, serial, argparse
 import numpy as np
 from time import sleep
+import time
 from collections import deque
 
 import matplotlib.pyplot as plt 
@@ -60,7 +61,7 @@ class AnalogPlot:
   def update(self, frameNum, a0, a1, a2, a3):
       try:
           line = self.ser.readline()
-          print(line.split())
+#          print(line.split())
           data = [float(val) for val in line.split()]
 
           if(len(data) == 3):
@@ -83,6 +84,7 @@ class AnalogPlot:
       self.ser.flush()
       self.ser.close()    
       self.dataLogger.save();
+      print "Average time interval: %f"%self.dataLogger.getAverageTimeInterval()
 
 
 
@@ -90,8 +92,9 @@ class AnalogPlot:
 
 # logging class
 class DataLogger:
-  # constr
   def __init__(self, fileSavePathARG, dataLength):
+      # Just for checking timestamps (time between samples)
+      self.timeStamps = np.zeros(dataLength).astype(float)
       # create data numpy-array
       self.data = np.zeros((dataLength,3)).astype(float)
       self.dataLength = dataLength
@@ -120,6 +123,12 @@ class DataLogger:
       #vector = np.array(argXYZval, dtype=float)
       self.data[self.numberOfSamlesAcquired] = np.array(argXYZval,dtype=float)
       #self.data[self.numberOfSamlesAcquired] = np.array((argXYZval[0],argXYZval[1],argXYZval[2]))
+      self.timeStamps[self.numberOfSamlesAcquired] = time.time()
+
+  def getAverageTimeInterval(self):
+      plt.plot(np.diff(self.timeStamps[2:]))
+      plt.show()
+      return np.average(np.diff(self.timeStamps[2:]))
 
   def finished(self):
       return self.bFinishedAcquiringData
@@ -129,18 +138,19 @@ class DataLogger:
 
   def plotData(self):
       plt.figure()
-      plt.plot(self.data[:,:])
+      plt.plot(self.data)
       plt.show(block=False)
-      sleep(3)
 
 
+# TODO: Lag -noplot funksjonalitet for å bare lagre data
+# TODO: Lag -silent funksjonalitet for å unngå å skrive ut
 # main() function
 def main():
   # create parser
   parser = argparse.ArgumentParser(description="LDR serial")
   # add expected arguments
   parser.add_argument('--port', dest='port', required=True)
-  parser.add_argument('--logLength', dest='logLength', default=0)
+  parser.add_argument('--log', dest='logLength', default=0)
   # parse args
   args = parser.parse_args()
   #strPort = '/dev/ttyACM1'
