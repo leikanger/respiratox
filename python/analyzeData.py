@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #import argparse
-import sys # for arguments
+import sys, argparse # for arguments
 import numpy as np
 import matplotlib.pyplot as plt 
 import scipy.signal as sgn
@@ -26,20 +26,26 @@ class DataReader:
     def getZ(self):
         return self.data[:,0];
 
+DEFAULT_SAMPLE_PERIOD = 0.054
+
 def main():
     # Check number of arguments:
-    if (len(sys.argv) != 2):
-        print "number of arguments is not 3: len = %d ----> %s\nTerminate execution"%(len(sys.argv), sys.argv)
-        exit(-1)
-    filePath = sys.argv[1]
-
+    parser = argparse.ArgumentParser("AnalyzeData");
+    # Add required arguments
+    parser.add_argument('--source', dest='dataFile', required=True)
+    parser.add_argument('--period', dest='samplePeriod',
+            default=DEFAULT_SAMPLE_PERIOD)
+    # parse args
+    args = parser.parse_args()
+    filePath = args.dataFile
+    averagePeriodBetweenSamples = float(args.samplePeriod)
+    
     data = DataReader(filePath)
 
     #plt.plot(data.get())
     #plt.show(block=False)
     #sleep(2)
 
-    averagePeriodBetweenSamples = 0.0542#4104#3367;
     plotPeriodograms(data.get(), averagePeriodBetweenSamples)
 
 def getInterestingIndexRange(freqAxis):
@@ -96,7 +102,7 @@ def plotPeriodograms(data, sampleTimePeriod):
     print "iterMaxZ = %d --- values (%f, %f)"%(iterMaxZ,fZ[iterMaxZ]*60, Pxx_denZ[iterMaxZ])
     print "iterMaxSUM = %d --- values (%f, %f)"%(iterMaxSUM,fZ[iterMaxSUM]*60, Pxx_denSUM[iterMaxSUM])
 
-    plt.ylim([1e-5, 1e5])
+    plt.ylim([1e-6, 1e2])
     plt.xlabel('frequency [RPM]')
     plt.ylabel('PSD [V**2/Hz]')
     titleString = "RR = %f RPM"%(fX[iterMaxSUM]*60)
