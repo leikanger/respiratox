@@ -4,6 +4,9 @@
  *      ./setUpVirtualSerialPort.sh), the virtual ports are created with an
  *      arbitratry path. This file is to make it more convenient to change
  *      this path.
+ *      XXX Read both the "input" and "output" paht from the return from
+ *      setUpVirtualSerialPort.sh bash script - that needs to be run after
+ *      each reboot or on new systems.
  */
 
 // The following serial ports are crated with [socat] shell command, and is
@@ -13,7 +16,7 @@ static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "/dev/pts/9";
 static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/11";
 #else
 static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "/dev/pts/1";
-static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/2";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "/dev/pts/7";
 #endif
 
 

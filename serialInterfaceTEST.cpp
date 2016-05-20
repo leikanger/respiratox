@@ -9,7 +9,7 @@ namespace bASIO = boost::asio;
 //======================                TEST                  ==================================
 //==============================================================================================
 BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
-BOOST_AUTO_TEST_CASE( serial_port_paths_excist )
+BOOST_AUTO_TEST_CASE( serial_port_paths_exist )
 {
     BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_INPUT) ); 
     BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_OUTPUT) ); 
@@ -26,8 +26,6 @@ BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )
 {
     TEST::emptySerialOutputBuffer();
     // Now, the rest of this test should  be redundant..
-
-
 
     // Write an empty string to ports, to clear last line but also to certify
     // return from head -1 command..

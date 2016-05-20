@@ -16,6 +16,7 @@ The network protocol is undecided
 This focus on having clear separation between code and signal protocol:
 remember to have a strong focus on interface and dependency inversion principle..
 
+
 TDD - Test Plan
 ================================================
 More detailed than the above req.spec., and also a plan for unit tests and
