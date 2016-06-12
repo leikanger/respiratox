@@ -1,9 +1,24 @@
 #include "serialInterfaceTEST.h"
+#include <memory>
 
 
 using std::cout;
 //namespace utf = boost::unit_test;
 namespace bASIO = boost::asio;
+
+// Fixture
+struct SerialCommunicationFixture {
+    SerialCommunicationFixture()
+        : pSendPort(new Serial(PATH_VIRTUAL_SERIAL_PORT_SEND)),
+        pReceivePort(new Serial(PATH_VIRTUAL_SERIAL_PORT_RECEIVE))
+    {
+        TEST::emptyVirtualSerialportBuffers();
+    }
+    ~SerialCommunicationFixture() { }
+    
+    std::shared_ptr<Serial> pSendPort;
+    std::shared_ptr<Serial> pReceivePort;
+};
 
 //==============================================================================================
 //======================                TEST                  ==================================
@@ -11,30 +26,30 @@ namespace bASIO = boost::asio;
 BOOST_AUTO_TEST_SUITE(serial_communication_through_virtual_serial_port);
 BOOST_AUTO_TEST_CASE( serial_port_paths_exist )
 {
-    BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_INPUT) ); 
-    BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_OUTPUT) ); 
+    BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_SEND) ); 
+    BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_RECEIVE) ); 
 }
 BOOST_AUTO_TEST_CASE( construct_Serial_object )
 {
     boost::system::error_code ec;
-    Serial testObj(PATH_VIRTUAL_SERIAL_PORT_OUTPUT, 9600, &ec);
+    Serial testObj(PATH_VIRTUAL_SERIAL_PORT_RECEIVE, 9600, &ec);
 
     // Bare test om objektet eksisterer: check ec for feil..
     BOOST_CHECK_MESSAGE( !ec, "Construction of serial object gave error message" <<ec.message().c_str() );
 }
 BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )
 {
-    TEST::emptySerialOutputBuffer();
-    // Now, the rest of this test should  be redundant..
+    TEST::emptyVirtualSerialportBuffers();
+        // Now, the rest of this test should  be redundant..
 
     // Write an empty string to ports, to clear last line but also to certify
     // return from head -1 command..
-    TEST::writeStringToFilepath("", PATH_VIRTUAL_SERIAL_PORT_INPUT);
-    TEST::writeStringToFilepath("", PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    TEST::writeStringToFilepath("", PATH_VIRTUAL_SERIAL_PORT_SEND);
+    TEST::writeStringToFilepath("", PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     // Then get the output for the two paths (will get input from the other
     // path -- fails if the paths are set incorrectly)
-    std::string cmdStringINPUT = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_INPUT;
-    std::string cmdStringOUPUT = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_OUTPUT;
+    std::string cmdStringINPUT = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_SEND;
+    std::string cmdStringOUPUT = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_RECEIVE;
     std::string ret1 = TEST::exec(cmdStringINPUT.c_str());
     std::string ret2 = TEST::exec(cmdStringOUPUT.c_str());
 
@@ -45,19 +60,19 @@ BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )
 }
 BOOST_AUTO_TEST_CASE( serial_read )
 {
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT); 
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE); 
     std::string testString = "asdfqwer1234æøå";
     std::string readBuffer;
 
-    TEST::writeStringToFilepath(testString, PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    TEST::writeStringToFilepath(testString, PATH_VIRTUAL_SERIAL_PORT_SEND);
     receivePort.read(&readBuffer);
     BOOST_CHECK_EQUAL(readBuffer, testString);   
 }
 BOOST_AUTO_TEST_CASE( serial_write )
 {
-    Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_INPUT);
+    Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_SEND);
     std::string testString = "asdfqwer1234";
-    std::string cmdString = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_OUTPUT;
+    std::string cmdString = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_RECEIVE;
         // Command reads last line in path (without '\n' on end)
     sendPort.write_message(testString);
     usleep(1000);
@@ -69,19 +84,76 @@ BOOST_AUTO_TEST_CASE( serial_write )
 
 BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
 {
-    Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_INPUT);
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    SerialCommunicationFixture F;
 
     std::string testString = "asdfqwer1234æøå";
     std::string stringRead = "";
-    sendPort.write_message(testString);
-    receivePort.read(&stringRead);
+    F.pSendPort->write_message(testString);
+    F.pReceivePort->read(&stringRead);
     BOOST_CHECK_EQUAL(testString, stringRead);
 }
+BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
+{
+    SerialCommunicationFixture F;
+
+    F.pSendPort->write_message("111.11\t222\t3.3333");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    BOOST_CHECK_EQUAL(result.size(), 3);
+}
+BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
+{
+    SerialCommunicationFixture F;
+
+    F.pSendPort->write_message("111.11\t222\t3.3333");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+
+    BOOST_CHECK_EQUAL(result[0], 111.11);
+    BOOST_CHECK_EQUAL(result[1], 222);
+    BOOST_CHECK_EQUAL(result[2], 3.3333);
+}
+BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error__3values )
+{
+    SerialCommunicationFixture F;
+
+    F.pSendPort->write_message("111.\t.1\t.0");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+
+    BOOST_CHECK_EQUAL(result[0], 111);
+    BOOST_CHECK_EQUAL(result[1], 0.1);
+    BOOST_CHECK_EQUAL(result[2], 0);
+}
+BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )
+{
+    SerialCommunicationFixture F;
+
+    F.pSendPort->write_message("1000000000.\t-1000000000\t0");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+
+    BOOST_CHECK_EQUAL(result[0], 1000000000);
+    BOOST_CHECK_EQUAL(result[1], -1000000000);
+}
+BOOST_AUTO_TEST_CASE( what_happens_when_last_value_doesnt_exist )
+{
+    SerialCommunicationFixture F;
+
+    F.pSendPort->write_message("111.1\t222.2");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    
+    BOOST_CHECK_EQUAL(result[0], 111.1);
+    BOOST_CHECK_EQUAL(result[1], 222.2);
+    BOOST_CHECK_EQUAL(result[2], 0);
+
+    // TODO Develop internal error check that all three variables are
+    // received!
+    //TODO BOOST_ERROR_MESSAGE(false, "make check for what happens when only two values are present(cut message) ? Or is this not impotant?" );
+}
+
+
+//*********************************
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
-// NEXT: TESTING ArduinoMOCK class.. NOT WORKING TODO
 BOOST_AUTO_TEST_SUITE( ArduinoMOCK_for_message_designing );
+// NEXT: TESTING ArduinoMOCK class.. NOT WORKING TODO
 BOOST_AUTO_TEST_CASE( thread_test )
 {
    using std::chrono::seconds;
@@ -92,13 +164,13 @@ BOOST_AUTO_TEST_CASE( thread_test )
 BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
 {
     // Empty previous messages through virtual serial port
-    TEST::emptySerialOutputBuffer();
+    TEST::emptyVirtualSerialportBuffers();
 
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     std::string testMelding="Yeah, test message\t12\t34";
     TEST::ArduinoMOCK test(testMelding);
     std::string message;
-    for( int i : {1,2,3,4,5} ) {
+    for( int i=5; i>0; --i) {
         receivePort.read(&message);
         BOOST_CHECK_EQUAL(message, testMelding);
     }
@@ -106,8 +178,8 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
 BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
 {
     std::cout<<"Stress test: ";
-    TEST::emptySerialOutputBuffer();
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+    TEST::emptyVirtualSerialportBuffers();
+    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     std::string testMelding="Yeah, test message\t12\t34";
     TEST::ArduinoMOCK test(testMelding, 0);
     std::string message;
@@ -116,50 +188,6 @@ BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
         BOOST_CHECK_EQUAL(message, testMelding);
     }
     // This test is unverified: It has never failed..
-}
-BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
-{
-    TEST::emptySerialOutputBuffer();
-
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
-    TEST::writeStringToFilepath("111.11\t222\t3.3333",PATH_VIRTUAL_SERIAL_PORT_INPUT);
-    std::vector<double> result = receivePort.getNextValueVector();
-    BOOST_CHECK_EQUAL(result.size(), 3);
-}
-BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
-{
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
-    TEST::writeStringToFilepath("111.11\t222\t3.3333",PATH_VIRTUAL_SERIAL_PORT_INPUT);
-    std::vector<double> result = receivePort.getNextValueVector();
-
-    BOOST_CHECK_EQUAL(result[0], 111.11);
-    BOOST_CHECK_EQUAL(result[1], 222);
-    BOOST_CHECK_EQUAL(result[2], 3.3333);
-}
-BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error__3values )
-{
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
-    TEST::writeStringToFilepath("111.\t.1\t.0",PATH_VIRTUAL_SERIAL_PORT_INPUT);
-    std::vector<double> result = receivePort.getNextValueVector();
-
-    BOOST_CHECK_EQUAL(result[0], 111);
-    BOOST_CHECK_EQUAL(result[1], 0.1);
-    BOOST_CHECK_EQUAL(result[2], 0);
-}
-BOOST_AUTO_TEST_CASE( what_happens_when_only_two_values_are_present )
-{
-    // TODO Develop internal error check that all three variables are
-    // received!
-    //TODO BOOST_ERROR_MESSAGE(false, "make check for what happens when only two values are present(cut message) ? Or is this not impotant?" );
-}
-BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )
-{
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
-    TEST::writeStringToFilepath("1000000000.\t-1000000000\t0",PATH_VIRTUAL_SERIAL_PORT_INPUT);
-    std::vector<double> result = receivePort.getNextValueVector();
-
-    BOOST_CHECK_EQUAL(result[0], 1000000000);
-    BOOST_CHECK_EQUAL(result[1], -1000000000);
 }
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 

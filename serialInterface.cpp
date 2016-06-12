@@ -52,6 +52,10 @@ Serial::~Serial()
 
 std::vector<double> Serial::getNextValueVector()
 {
+    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
+    // TODO * Legg inn default value dersom vector ikkje har tre verdier TODO
+    // TODO * Legg inn feilsjekking mot at vi går utafor bufferlengda!!! TODO
+    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
     using std::string;
     const char VALUE_SEPARATOR = '\t';
     std::vector<double> returnValues;
@@ -59,9 +63,6 @@ std::vector<double> Serial::getNextValueVector()
     std::string buffer;
     read(&buffer);
     string::size_type nextMark = 0;
-    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
-    // TODO Legg inn feilsjekking mot at vi går utafor bufferlengda!!!   TODO
-    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
     for (int i = 0; i<3; ++i) {
         nextMark = buffer.find(VALUE_SEPARATOR);
         returnValues.push_back(boost::lexical_cast<double>(buffer.substr(0,nextMark)));

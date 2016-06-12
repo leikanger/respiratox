@@ -22,7 +22,7 @@ namespace TEST{
         const unsigned int delayBetweenMessagesMs;
     
         ArduinoMOCK(std::string argConstMessage ="", unsigned int argDelayBetweenMessagesMs =200) 
-          : serialPort(PATH_VIRTUAL_SERIAL_PORT_INPUT) 
+          : serialPort(PATH_VIRTUAL_SERIAL_PORT_SEND) 
           , bContinueExecution{true}
           , constMessage(argConstMessage)
           , delayBetweenMessagesMs(argDelayBetweenMessagesMs)
@@ -56,7 +56,7 @@ namespace TEST{
             }
             std::cout<<std::endl;
         }
-        // XXX The next funciton documents how messages shall be written
+        // XXX The following method shows how messages shall be written
         std::string getNextMessage()
         {
             if (constMessage == "") {
@@ -123,10 +123,10 @@ namespace TEST{
         }
     }
 
-    void emptySerialOutputBuffer()
+    void emptyVirtualSerialportBuffers()
     {
         boost::asio::io_service ioservice;
-        boost::asio::serial_port serialPort(ioservice, PATH_VIRTUAL_SERIAL_PORT_OUTPUT);
+        boost::asio::serial_port serialPort(ioservice, PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
         boost::system::error_code ec;
         TEST::flush_serial_port(serialPort, flush_receive, ec);
         if (ec)
