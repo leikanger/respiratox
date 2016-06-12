@@ -1,5 +1,7 @@
 # respiratox
-Desktop client for receiving data from RespirationRate measurements.
+C++ Experiment on Desktop client for receiving data from RespirationRate
+measurements. NOT IN USE (only for initial testing of the BOOST asio library).
+Proof of concept in python excists in closed repo.
 
 # TDD prerequisites
 The boost unit test framework is used, and a virtual serial port must be set
