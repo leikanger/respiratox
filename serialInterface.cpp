@@ -52,10 +52,6 @@ Serial::~Serial()
 
 std::vector<double> Serial::getNextValueVector()
 {
-    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
-    // TODO * Legg inn default value dersom vector ikkje har tre verdier TODO
-    // TODO * Legg inn feilsjekking mot at vi går utafor bufferlengda!!! TODO
-    // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
     using std::string;
     const char VALUE_SEPARATOR = '\t';
     const double DEFAULT_VALUE = 0;
@@ -86,7 +82,6 @@ std::vector<double> Serial::getNextValueVector()
     return returnValues;
 }
 
-// TODO: Gå vekk fra bool return value -> heller hold standard linux return value : int (med feilkode = !0)
 /**********************************
  * Serial::read(sting&, unsigned) *
  *  - reads out string of chars untill MESSAGE_SEPARATOR character

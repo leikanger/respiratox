@@ -169,6 +169,20 @@ BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_with_separator )
 
     cout<<result[0] <<" "<<result[1] <<" "  <<result[2] <<" " <<"\n";
 }
+BOOST_AUTO_TEST_CASE( only_one_value_and_no_ending_separator )
+{
+    SerialCommunicationFixture F;
+
+    F.pSendPort->write_message("111.1");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    
+    BOOST_CHECK_EQUAL(result[0], 111.1);
+    BOOST_CHECK_EQUAL(result[1], 0);
+    // If last value doesn't exist, it shall be zero
+    BOOST_CHECK_EQUAL(result[2], 0);
+
+    cout<<result[0] <<" "<<result[1] <<" "  <<result[2] <<" " <<"\n";
+}
 
 //*********************************
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
