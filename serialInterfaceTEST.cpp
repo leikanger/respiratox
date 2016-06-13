@@ -100,6 +100,15 @@ BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
     std::vector<double> result = F.pReceivePort->getNextValueVector();
     BOOST_CHECK_EQUAL(result.size(), 3);
 }
+BOOST_AUTO_TEST_CASE( separate_message_into_3_values_when_only_2_present )
+{
+    // The message is separated into 3 value: DEFAULT_VAULE as third value..
+    SerialCommunicationFixture F;
+
+    F.pSendPort->write_message("111.11\t222");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    BOOST_CHECK_EQUAL(result.size(), 3);
+}
 BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
 {
     SerialCommunicationFixture F;
@@ -132,7 +141,7 @@ BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )
     BOOST_CHECK_EQUAL(result[0], 1000000000);
     BOOST_CHECK_EQUAL(result[1], -1000000000);
 }
-BOOST_AUTO_TEST_CASE( what_happens_when_last_value_doesnt_exist )
+BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_no_separator )
 {
     SerialCommunicationFixture F;
 
@@ -141,13 +150,25 @@ BOOST_AUTO_TEST_CASE( what_happens_when_last_value_doesnt_exist )
     
     BOOST_CHECK_EQUAL(result[0], 111.1);
     BOOST_CHECK_EQUAL(result[1], 222.2);
+    // If last value doesn't exist, it shall be zero
     BOOST_CHECK_EQUAL(result[2], 0);
 
-    // TODO Develop internal error check that all three variables are
-    // received!
-    //TODO BOOST_ERROR_MESSAGE(false, "make check for what happens when only two values are present(cut message) ? Or is this not impotant?" );
+    cout<<result[0] <<" "<<result[1] <<" "  <<result[2] <<" " <<"\n";
 }
+BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_with_separator )
+{
+    SerialCommunicationFixture F;
 
+    F.pSendPort->write_message("111.1\t222.2\t");
+    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    
+    BOOST_CHECK_EQUAL(result[0], 111.1);
+    BOOST_CHECK_EQUAL(result[1], 222.2);
+    // If last value doesn't exist, it shall be zero
+    BOOST_CHECK_EQUAL(result[2], 0);
+
+    cout<<result[0] <<" "<<result[1] <<" "  <<result[2] <<" " <<"\n";
+}
 
 //*********************************
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile

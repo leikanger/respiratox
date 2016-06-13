@@ -58,15 +58,29 @@ std::vector<double> Serial::getNextValueVector()
     // TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO  TODO
     using std::string;
     const char VALUE_SEPARATOR = '\t';
-    std::vector<double> returnValues;
+    const double DEFAULT_VALUE = 0;
+    // preinit vector so that we can return when error is detected
+    // (setting the rest of the values to DEFAULT_VALUE)
+    std::vector<double> returnValues = {    DEFAULT_VALUE,
+                                            DEFAULT_VALUE,
+                                            DEFAULT_VALUE};
     
     std::string buffer;
     read(&buffer);
     string::size_type nextMark = 0;
     for (int i = 0; i<3; ++i) {
         nextMark = buffer.find(VALUE_SEPARATOR);
-        returnValues.push_back(boost::lexical_cast<double>(buffer.substr(0,nextMark)));
+
+        returnValues.at(i) =
+                boost::lexical_cast<double>(buffer.substr(0,nextMark));
         buffer = buffer.substr(nextMark+1);
+        // If nextMark is bigger than buffer.size, no more marks are found,
+        // and if we have not found all 3 values, previous default
+        // initialization to DEFAULT_VALUE makes it possible to break:
+        if (nextMark > buffer.size() && i<3) {
+            // but we have not found 3 values yet
+            break;
+        }
     }
 
     return returnValues;
@@ -85,11 +99,15 @@ std::vector<double> Serial::getNextValueVector()
 int Serial::read(std::string* pTekstBuffer)
 {
   /* Effektivisere, når alt funker:
-   *    Alternativ 1: XXX Strategi: Les inn fleire tegn (type:20 chars), og leit etter '\n' i 
-   * denne sekvensen. Når det finnes, klargjør returverdi med det som er før (sammen med en static buffer
-   * variabel), og lagre det som er etter '\n' i den samme buffervariabel (for neste melding).
-   *    Alternativ 2: XXX Statisk lengde på signalet: dette gjør at vi kan lese ut denne lengden
-   * med asio.read -- det negative er at dette kanskje går på bekostning av sikkerhet?
+   *    Alternativ 1: XXX Strategi: Les inn fleire tegn (type:20 chars), og 
+   *    leit etter '\n' i denne sekvensen. Når det finnes, klargjør 
+   *    returverdi med det som er før (sammen med en static buffer variabel),
+   *    og lagre det som er etter '\n' i den samme buffervariabel (for neste
+   *    melding).
+   *
+   *    Alternativ 2: XXX Statisk lengde på signalet: dette gjør at vi kan 
+   *    lese ut denne lengden med asio.read -- det negative er at dette 
+   *    kanskje går på bekostning av sikkerhet?
    */
     const char MESSAGE_SEPARATOR = '\n';
     static char nextChar;
@@ -104,8 +122,9 @@ int Serial::read(std::string* pTekstBuffer)
         pTekstBuffer->push_back(nextChar);
     }
     if (ec) {
-        std::cout<<"error : serialPort set baud_rate faila : reported error ec=" 
-            <<ec.message().c_str() <<std::endl;
+        std::cout<<"error : serialPort set baud_rate faila : "
+                 <<"reported error ec=" 
+                 <<ec.message().c_str() <<std::endl;
         // terminate!! 
         exit(0);
         return -1;
