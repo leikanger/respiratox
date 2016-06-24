@@ -19,27 +19,29 @@ Serial::Serial( const std::string& portPath,
                 boost::system::error_code* pec /*==null_ptr*/)
     : io(), serialPort(io), serialPortPath(portPath)
 {
-    //std::cout<<"Constructing Serial object with path: " <<portPath <<" baud_rate: " <<baudRateArg <<"\n";
-    
     // For default argument *pec = 0 (no bs::error_code supplied), create
     // error code-dummy and take dummy's address:
+    using std::cout;
     using BSerror_code = boost::system::error_code;
+
     BSerror_code dummyEC;
-    if (pec == nullptr) { // erroc_code address supplied = 0 -- create local error-code obj.
+    if (pec == nullptr) { // erroc_code address supplied = 0 -- create local 
+                          //    error-code obj.
         pec = &dummyEC;
     }
     serialPort.open(portPath, *pec);
     if (*pec) {
-        std::cout<<"error : serialPort.open(" <<portPath <<",ec) reported error ec=" 
-            <<pec->message().c_str() <<std::endl;
+        std::cout<<"error : serialPort.open(" <<portPath 
+            <<",ec) reported error ec=" <<pec->message().c_str() <<std::endl;
         // terminate!! 
         exit(0); // TODO return direkte herifra: Husk at ec--som-er-en-ref-variabel-- blir satt ved feil!! 
-        // Kan sjekkes utafor!!!
+        // TODO  Throw exception.
     }
 
-    serialPort.set_option( boost::asio::serial_port_base::baud_rate(baudRateArg), *pec);
+    serialPort.set_option( 
+            boost::asio::serial_port_base::baud_rate(baudRateArg), *pec);
     if (*pec) {
-        std::cout<<"error : serialPort set baud_rate faila : reported error ec=" 
+        cout<<"error : serialPort set baud_rate faila : reported error ec="
             <<pec->message().c_str() <<std::endl;
         // terminate!! 
         exit(0);
@@ -74,7 +76,6 @@ std::vector<double> Serial::getNextValueVector()
         // and if we have not found all 3 values, previous default
         // initialization to DEFAULT_VALUE makes it possible to break:
         if (nextMark > buffer.size() && i<3) {
-            // but we have not found 3 values yet
             break;
         }
     }
@@ -91,8 +92,6 @@ std::vector<double> Serial::getNextValueVector()
  *  and continue where it left off last time -- and read in data in batches.
  *  Better for efficiency (but don't start with optimalization!)
  */
-int Serial::read(std::string* pTekstBuffer)
-{
   /* Effektivisere, når alt funker:
    *    Alternativ 1: XXX Strategi: Les inn fleire tegn (type:20 chars), og 
    *    leit etter '\n' i denne sekvensen. Når det finnes, klargjør 
@@ -104,6 +103,8 @@ int Serial::read(std::string* pTekstBuffer)
    *    lese ut denne lengden med asio.read -- det negative er at dette 
    *    kanskje går på bekostning av sikkerhet?
    */
+int Serial::read(std::string* pTekstBuffer)
+{
     const char MESSAGE_SEPARATOR = '\n';
     static char nextChar;
     *pTekstBuffer = "";
@@ -117,7 +118,7 @@ int Serial::read(std::string* pTekstBuffer)
         pTekstBuffer->push_back(nextChar);
     }
     if (ec) {
-        std::cout<<"error : serialPort set baud_rate faila : "
+        std::cout<<"error : serialPort set baud_rate failed : "
                  <<"reported error ec=" 
                  <<ec.message().c_str() <<std::endl;
         // terminate!! 
@@ -128,7 +129,7 @@ int Serial::read(std::string* pTekstBuffer)
     if (nextChar != '\n') {
 		// it must have timed out.
         return -2;
-		//throw std::exception("Read timed out!");
+        // TODO Gå over til: : throw std::exception("Read timed out!");
 	  }
     return 0;
 }
@@ -146,18 +147,3 @@ int Serial::write_some(const char* buf, const int size)
 
    return serialPort.write_some(boost::asio::buffer(buf, size), ec);
 }
-/*
-bool Serial::sendMessage(const std::string& tekst) const
-{
-    static std::array<const char*, 1024> staticBuffer;
-    staticBuffer.front() = tekst.c_str();
-    serialPort.write_some(bASIO::buffer(staticBuffer));
-#if 0
-    static std::string staticStringBuffer;
-    staticStringBuffer = tekst;
-    serialPort.write_some(bASIO::buffer(tekst), tekst.length());
-#endif
-
-    return true;
-}
-*/

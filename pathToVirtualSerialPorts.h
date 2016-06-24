@@ -15,8 +15,8 @@
 static const std::string PATH_VIRTUAL_SERIAL_PORT_SEND = "/dev/pts/9";
 static const std::string PATH_VIRTUAL_SERIAL_PORT_RECEIVE= "/dev/pts/11";
 #else
-static const std::string PATH_VIRTUAL_SERIAL_PORT_SEND = "/dev/pts/2";
-static const std::string PATH_VIRTUAL_SERIAL_PORT_RECEIVE= "/dev/pts/3";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_SEND = "/dev/pts/4";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_RECEIVE= "/dev/pts/5";
 #endif
 
 
