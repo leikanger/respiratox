@@ -19,11 +19,11 @@ Serial::Serial( const std::string& portPath,
                 boost::system::error_code* pec /*==null_ptr*/)
     : ioService(), serialPort(ioService), serialPortPath(portPath)
 {
-    // For default argument *pec = 0 (no bs::error_code supplied), create
-    // error code-dummy and take dummy's address:
     using std::cout;
     using BSerror_code = boost::system::error_code;
 
+    // For default argument *pec = 0 (no bs::error_code supplied), create
+    // error code-dummy and take dummy's address:
     BSerror_code dummyEC;
     if (pec == nullptr) { // erroc_code address supplied = 0 -- create local 
                           //    error-code obj.
@@ -39,11 +39,13 @@ Serial::Serial( const std::string& portPath,
     }
 
     serialPort.set_option( 
-            boost::asio::serial_port_base::baud_rate(baudRateArg), *pec);
+                boost::asio::serial_port_base::baud_rate(baudRateArg), 
+                *pec
+                         );
     if (*pec) {
         cout<<"error : serialPort set baud_rate faila : reported error ec="
             <<pec->message().c_str() <<std::endl;
-        // terminate!! 
+        // todo: Make exeption scheme.
         exit(0);
     }
 }
@@ -52,23 +54,27 @@ Serial::~Serial()
     serialPort.close(); 
 }
 
+/******
+ * PLAN:
+ * getNextValueVector kallar readNextValue tre gangar (med feilhåndtering for
+ * for store vektorer eller for lite data), som vidare kallar findNextMark.
+ * Ala det som er kladda under! TODO */
 std::vector<double> Serial::getNextValueVector()
 {
     using std::string;
-    const char VALUE_SEPARATOR = '\t';
-    const double DEFAULT_VALUE = 0;
-    // preinit vector so that we can return when error is detected
-    // (setting the rest of the values to DEFAULT_VALUE)
-    std::vector<double> returnValues = {    DEFAULT_VALUE,
-                                            DEFAULT_VALUE,
-                                            DEFAULT_VALUE};
+    using std::vector;
+    const double DEFAULT_VAL = 0;
+    vector<double> returnValues = {DEFAULT_VAL, DEFAULT_VAL, DEFAULT_VAL};
+        // preinit vector so that we can return whenever error is detected
     
     std::string buffer;
-    read(&buffer);
-    string::size_type nextMark = 0;
+    this->read(&buffer); /* TODO Skal denne vere this-> ?? -- utesta */
     for (int i = 0; i<3; ++i) {
-        nextMark = buffer.find(VALUE_SEPARATOR);
 
+
+        // VIDARE ER DET MYKJE ROT etter at eg har tatt koden ut og laga dei
+        // to neste fuknsjonane.. 
+        //
         returnValues.at(i) =
                 boost::lexical_cast<double>(buffer.substr(0,nextMark));
         buffer = buffer.substr(nextMark+1);
@@ -82,6 +88,39 @@ std::vector<double> Serial::getNextValueVector()
 
     return returnValues;
 }
+
+// TODO Gjør om til: string findNextValueString, og heller gjør omforminga i 
+// førre funksjonen (-10 linjer).
+static double findNextValue( 
+                    const std::string& textLine,
+                    string::size_type& mutableFromMarkArg =0
+                           )
+{
+    string::size_type nextMark = 0;
+    double returnValue = 0.0;
+
+    if (nextMark == mutableFromMarkArg) {
+        std::cout<<"ERROR: Not yet considered condition! @asdf234\n";
+        // No more values found. TODO Handle this!
+    } else {
+        boost::lexical_cast<double>(
+                                textLine.substr(mutableFromMarkArg, nextMark) 
+                                   );
+    }
+}
+static string::size_type findNextMark( const std::string& buffer, 
+                                       string::size_type lastMark =0)
+{
+    static const char VALUE_SEPARATOR = '\t';
+
+    return buffer.find(VALUE_SEPARATOR, lastMark );
+}
+
+std::string nextValue(std::string remainingMsg, std::string valueSeparator)
+{
+     
+}
+
 
 /**********************************
  * Serial::read(sting&, unsigned) *
