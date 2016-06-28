@@ -23,19 +23,16 @@ BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( badly_forme
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( construct_Serial_object )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )$/;"	f
-BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_no_separator )$/;"	f
-BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_with_separator )$/;"	f
-BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( only_one_value_and_no_ending_separator )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( separate_message_into_3_values )$/;"	f
-BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( separate_message_into_3_values_when_only_2_present )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( serial_port_paths_exist )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( serial_read )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( serial_write )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )$/;"	f
 BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( thread_test )$/;"	f
+BOOST_AUTO_TEST_CASE	serialInterfaceTEST.cpp	/^BOOST_AUTO_TEST_CASE( what_happens_when_only_two_values_are_present )$/;"	f
 BOOST_LIBR	Makefile	/^BOOST_LIBR=-lboost_system -lboost_thread$/;"	m
 BOOST_TEST_DYN_LINK	serialInterfaceTEST.h	5;"	d
 BOOST_TEST_MODULE	serialInterfaceTEST.h	4;"	d
@@ -73,8 +70,8 @@ On_Pur	terminalOutputColors.h	/^const string IPur="\\e[0;95m";    const string B
 On_Red	terminalOutputColors.h	/^const string IRed="\\e[0;91m";    const string BIRed="\\e[1;91m";   	const string On_Red="\\e[41m";    const string On_IRed="\\e[0;101m";$/;"	m	namespace:textColor
 On_Whi	terminalOutputColors.h	/^const string IWhi="\\e[0;97m";    const string BIWhi="\\e[1;97m";   	const string On_Whi="\\e[47m";    const string On_IWhi="\\e[0;107m";$/;"	m	namespace:textColor
 On_Yel	terminalOutputColors.h	/^const string IYel="\\e[0;93m";    const string BIYel="\\e[1;93m";   	const string On_Yel="\\e[43m";    const string On_IYel="\\e[0;103m";$/;"	m	namespace:textColor
-PATH_VIRTUAL_SERIAL_PORT_RECEIVE	pathToVirtualSerialPorts.h	/^static const std::string PATH_VIRTUAL_SERIAL_PORT_RECEIVE= "\/dev\/pts\/2";$/;"	v
-PATH_VIRTUAL_SERIAL_PORT_SEND	pathToVirtualSerialPorts.h	/^static const std::string PATH_VIRTUAL_SERIAL_PORT_SEND = "\/dev\/pts\/0";$/;"	v
+PATH_VIRTUAL_SERIAL_PORT_INPUT	pathToVirtualSerialPorts.h	/^static const std::string PATH_VIRTUAL_SERIAL_PORT_INPUT = "\/dev\/pts\/2";$/;"	v
+PATH_VIRTUAL_SERIAL_PORT_OUTPUT	pathToVirtualSerialPorts.h	/^static const std::string PATH_VIRTUAL_SERIAL_PORT_OUTPUT= "\/dev\/pts\/3";$/;"	v
 Purple	terminalOutputColors.h	/^const string Purple ="\\e[0;35m"; const string BPurple="\\e[1;35m"; 	const string UPurple="\\e[4;35m";$/;"	m	namespace:textColor
 RColor	terminalOutputColors.h	/^const string RColor = "\\e[0m";    \/\/ Text Reset$/;"	m	namespace:textColor
 Red	terminalOutputColors.h	/^const string Red 	="\\e[0;31m"; const string BRed 	="\\e[1;31m"; 	const string URed="\\e[4;31m";$/;"	m	namespace:textColor
@@ -82,8 +79,6 @@ SERIALINTERFACETEST_H	serialInterfaceTEST.h	2;"	d
 SERIALINTERFACE_H	serialInterface.h	8;"	d
 Serial	serialInterface.cpp	/^Serial::Serial( const std::string& portPath,$/;"	f	class:Serial
 Serial	serialInterface.h	/^class Serial {$/;"	c
-SerialCommunicationFixture	serialInterfaceTEST.cpp	/^    SerialCommunicationFixture()$/;"	f	struct:SerialCommunicationFixture
-SerialCommunicationFixture	serialInterfaceTEST.cpp	/^struct SerialCommunicationFixture {$/;"	s	file:
 SerialInterface	serialInterface.h	/^class SerialInterface {$/;"	c
 TERMINALOUTPUTCOLORS_H	terminalOutputColors.h	4;"	d
 TEST	serialInterfaceTEST.h	/^namespace TEST{$/;"	n
@@ -101,7 +96,7 @@ bContinueExecution	serialInterfaceTEST.h	/^        bool bContinueExecution;$/;"	
 constMessage	serialInterfaceTEST.h	/^        const std::string constMessage;$/;"	m	struct:TEST::ArduinoMOCK
 delayBetweenMessagesMs	serialInterfaceTEST.h	/^          , delayBetweenMessagesMs(argDelayBetweenMessagesMs)$/;"	f	struct:TEST::ArduinoMOCK
 delayBetweenMessagesMs	serialInterfaceTEST.h	/^        const unsigned int delayBetweenMessagesMs;$/;"	m	struct:TEST::ArduinoMOCK
-emptyVirtualSerialportBuffers	serialInterfaceTEST.h	/^    void emptyVirtualSerialportBuffers()$/;"	f	namespace:TEST
+emptySerialOutputBuffer	serialInterfaceTEST.h	/^    void emptySerialOutputBuffer()$/;"	f	namespace:TEST
 exec	serialInterfaceTEST.h	/^    std::string exec(const char* cmd) {$/;"	f	namespace:TEST
 fileExists	serialInterfaceTEST.h	/^    bool fileExists(const std::string& filePath)$/;"	f	namespace:TEST
 flush_both	serialInterfaceTEST.h	/^        flush_both = TCIOFLUSH$/;"	e	enum:TEST::flush_type
@@ -117,8 +112,6 @@ main	asio/clientTCP.cpp	/^int main(int argc, char** argv)$/;"	f
 main	asio/serverTCP.cpp	/^int main()$/;"	f
 make_coord_array	asio/serverTCP.cpp	/^std::vector<uint16_t> make_coord_array(size_t vectorLength)$/;"	f
 make_daytime_string	asio/serverTCP.cpp	/^std::string make_daytime_string()$/;"	f
-pReceivePort	serialInterfaceTEST.cpp	/^    std::shared_ptr<Serial> pReceivePort;$/;"	m	struct:SerialCommunicationFixture	file:
-pSendPort	serialInterfaceTEST.cpp	/^    std::shared_ptr<Serial> pSendPort;$/;"	m	struct:SerialCommunicationFixture	file:
 read	serialInterface.cpp	/^int Serial::read(std::string* pTekstBuffer)$/;"	f	class:Serial
 run	serialInterfaceTEST.h	/^        void run()$/;"	f	struct:TEST::ArduinoMOCK
 serialPort	serialInterface.h	/^    boost::asio::serial_port serialPort;$/;"	m	class:Serial
@@ -132,4 +125,3 @@ write_message	serialInterface.cpp	/^int Serial::write_message(std::string pTextB
 write_some	serialInterface.cpp	/^int Serial::write_some(const char* buf, const int size)$/;"	f	class:Serial
 ~ArduinoMOCK	serialInterfaceTEST.h	/^        ~ArduinoMOCK() {        stop();         }$/;"	f	struct:TEST::ArduinoMOCK
 ~Serial	serialInterface.cpp	/^Serial::~Serial()$/;"	f	class:Serial
-~SerialCommunicationFixture	serialInterfaceTEST.cpp	/^    ~SerialCommunicationFixture() { }$/;"	f	struct:SerialCommunicationFixture

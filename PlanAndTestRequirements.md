@@ -15,8 +15,6 @@ The network protocol is undecided
 ------------------------------------------------
 This focus on having clear separation between code and signal protocol:
 remember to have a strong focus on interface and dependency inversion principle..
--> BOOST::ASIO gjør at man kan bruke både nett og seriell (f.eks. I2C), som er
-viktig å hugse på vidare! Eit bib for alt som trengs!
 
 
 TDD - Test Plan
