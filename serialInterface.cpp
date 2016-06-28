@@ -8,16 +8,16 @@ namespace bASIO=boost::asio;
 
 // Serial interface through virtual serial port
 /**
- * Constructor.
- * \param port device name, example "/dev/ttyUSB0" or "COM4"
- * \param baud_rate communication speed, example 9600 or 115200
- * \throws boost::system::system_error if cannot open the
- * serial device
+ * Serial::Serial( const string& portPath, unsinged baudRate, errorCode)
+ *      \param port device name, example "/dev/ttyUSB0" or "COM4"
+ *      \param baud_rate communication speed, example 9600 or 115200
+ *      \throws boost::system::system_error if cannot open the
+ *      serial device
 **/
 Serial::Serial( const std::string& portPath,
                 unsigned int baudRateArg /*=9600*/,
                 boost::system::error_code* pec /*==null_ptr*/)
-    : io(), serialPort(io), serialPortPath(portPath)
+    : ioService(), serialPort(ioService), serialPortPath(portPath)
 {
     // For default argument *pec = 0 (no bs::error_code supplied), create
     // error code-dummy and take dummy's address:

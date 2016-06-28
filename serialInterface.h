@@ -26,7 +26,7 @@ public:
     std::vector<double> getNextValueVector();
 private:
     int write_some(const char* buf, const int size);
-    boost::asio::io_service io;
+    boost::asio::io_service ioService;
     boost::asio::serial_port serialPort;
     const std::string serialPortPath;
 };
