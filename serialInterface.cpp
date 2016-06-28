@@ -56,15 +56,13 @@ std::vector<double> Serial::getNextValueVector()
 {
     using std::string;
     const char VALUE_SEPARATOR = '\t';
-    const double DEFAULT_VALUE = 0;
-    // preinit vector so that we can return when error is detected
-    // (setting the rest of the values to DEFAULT_VALUE)
-    std::vector<double> returnValues = {    DEFAULT_VALUE,
-                                            DEFAULT_VALUE,
-                                            DEFAULT_VALUE};
+
+    const double DEFAULT_VAL = 0;
+    std::vector<double> returnValues = {DEFAULT_VAL,DEFAULT_VAL,DEFAULT_VAL};
+        // preinit vector so that we can return when error is detected
     
     std::string buffer;
-    read(&buffer);
+    this->read(&buffer); 
     string::size_type nextMark = 0;
     for (int i = 0; i<3; ++i) {
         nextMark = buffer.find(VALUE_SEPARATOR);
@@ -72,10 +70,9 @@ std::vector<double> Serial::getNextValueVector()
         returnValues.at(i) =
                 boost::lexical_cast<double>(buffer.substr(0,nextMark));
         buffer = buffer.substr(nextMark+1);
-        // If nextMark is bigger than buffer.size, no more marks are found,
-        // and if we have not found all 3 values, previous default
-        // initialization to DEFAULT_VALUE makes it possible to break:
-        if (nextMark > buffer.size() && i<3) {
+        // If nextMark is bigger than buffer.size, no more marks are found.
+        // Break loop and let possible remaining values default to DEFAULT_VAL.
+        if (nextMark > buffer.size()) {
             break;
         }
     }
@@ -118,12 +115,14 @@ int Serial::read(std::string* pTekstBuffer)
         pTekstBuffer->push_back(nextChar);
     }
     if (ec) {
-        std::cout<<"error : serialPort set baud_rate failed : "
+        std::cout<<"error : serialPort read(str*) failed : "
                  <<"reported error ec=" 
                  <<ec.message().c_str() <<std::endl;
         // terminate!! 
         exit(0);
         return -1;
+        // IKKJE: throw std::string("Serial::read(str*) failed");
+        // ( den er ikkje exception safe - kan kaste sjølv igjen.. )
     }
 
     if (nextChar != '\n') {
