@@ -1,8 +1,15 @@
 CC=clang++
 CFLAGS=-std=c++11 -Wall -lpthread
-BOOST_LIBR=-lboost_system -lboost_thread
+BOOST_LIBR=-lboost_system
 
-all: test
+all: test_without_running
+
+main: main.cpp serialInterface.o
+	$(CC) $(CFLAGS) $(BOOST_LIBR) main.cpp serialInterface.o -o main.out
+
+
+
+
 
 # Neste lager og kjører testen!
 test: test_without_running
@@ -21,6 +28,3 @@ test_old_all_files: *cpp *h
 
 clean:
 	rm *.out *.o
-
-#serial: serialInterface.cpp serialInterface.h
-#	clang++ serialInterface.cpp

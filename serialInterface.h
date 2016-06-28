@@ -7,12 +7,6 @@
 #ifndef SERIALINTERFACE_H
 #define SERIALINTERFACE_H
 
-class SerialInterface {
-public:
-    virtual void sendMessage(const std::string &sstringArg) =0;
-    virtual const std::string getMessage() const                  =0;
-};
-
 /************/
 /** Serial **/
 /************/
