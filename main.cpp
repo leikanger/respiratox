@@ -4,7 +4,8 @@
 
 int main()
 {
-    static Serial comDev{"/dev/i2c-2"};
+    //static Serial comDev{"/dev/i2c-2"};
+    static Serial comDev("/dev/pts/0");
 
     boost::asio::io_service io;
 
