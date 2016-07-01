@@ -1,7 +1,6 @@
-#include "StdAfx.h"
-
-#include <Setupapi.h>
-#pragma comment(lib, "Setupapi.lib")
+//#include "StdAfx.h"
+//#include <Setupapi.h>
+//#pragma comment(lib, "Setupapi.lib")
 
 #include "SerialPort.h"
 

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "SerialPort.h"
 
 int main(int argc, char* argv[])
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 	serial.write_some("RA01000\r\n");
 
 	// wait
-	Sleep(5 * 1000);
+    boost::this_thread::sleep(boost::posix_time::milliseconds(5 * 1000));
 
 	serial.stop();
 

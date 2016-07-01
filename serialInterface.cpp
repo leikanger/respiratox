@@ -44,9 +44,10 @@ Serial::Serial( const std::string& portPath,
     serialPort.set_option( bASIO::serial_port_base::character_size(8) );
     serialPort.set_option( bASIO::serial_port_base::stop_bits(  /* ... */
     /**/                        bASIO::serial_port_base::stop_bits::one) );
-	//port_->set_option(boost::asio::serial_port_base::stop_bits(boost::asio::serial_port_base::stop_bits::one));
-	//port_->set_option(boost::asio::serial_port_base::parity(boost::asio::serial_port_base::parity::none));
-	//port_->set_option(boost::asio::serial_port_base::flow_control(boost::asio::serial_port_base::flow_control::none));
+    serialPort.set_option( bASIO::serial_port_base::parity(
+    /**/                        bASIO::serial_port_base::parity::none));
+    serialPort.set_option( bASIO::serial_port_base::flow_control(
+    /**/                        bASIO::serial_port_base::flow_control::none));
 
     if (*pec) {
         cout<<"error : serialPort set baud_rate faila : reported error ec="
