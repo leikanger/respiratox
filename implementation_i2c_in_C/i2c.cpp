@@ -20,26 +20,37 @@ static int specifyDevI2cAddress(int file, int addr);
 
 int main()
 {
+    printf("Startar program\n");
+
     int file = openI2Cfile(2);
     
-    if (!specifyDevI2cAddress(file,0x1d)) {
+    if (specifyDevI2cAddress(file, 0x1d)) {
         /* ERROR HANDLING: check errno to see what went wrong */
+        printf("ERROR after specifyDevI2cAddress(.,.)\n");
         exit(1);
     }
 
     
     // TESTING THE CODE: ******* TODO Extract into function!
-     __u8 reg = 0x10; /* Device register to access */
+     __u8 reg = 0x32; /* Device register to access */
      __s32 res;
     char buf[10];
 
+    printf("her -- file: %d\n", file);
     /* Using SMBus commands */
     res = i2c_smbus_read_word_data(file, reg);
+    if (res)
+        printf("res %d\n", res);
+    else
+        printf("ikkje res\n");
+    printf("her2\n");
+
     if (res < 0) {
+        perror("i2c_smbus_read_word_data(file,reg)");
         /* ERROR HANDLING: i2c transaction failed */
     } else {
         /* res contains the read word */
-        printf("Las ut %s\n");
+        printf("Las ut %d\n", res);
     }
 
 #if 0
@@ -70,6 +81,7 @@ static int openI2Cfile(int adapterNr)
     char fileName[20];
 
     snprintf(fileName, 19, "/dev/i2c-%d", adapterNr);
+    printf("KOMMANDO: %s\n",fileName);
     file = open(fileName, O_RDWR);
     if (file<0) {
         /* ERROR handling: check errno to see what went wrong */
@@ -81,8 +93,9 @@ static int openI2Cfile(int adapterNr)
 // We have opened the right adapter - need to specify address for i2c dev
 static int specifyDevI2cAddress(int file, int i2cAddr)
 {
-    // TODO Legg inn feilcheck!! TODO på argmuneta!
+    // TODO Legg inn feilcheck! - på argmuneta!
     if (ioctl(file, I2C_SLAVE, i2cAddr)<0) {
+        perror("specifyDevI2cAddress(..) error : ");
         return 1;
     }
     return 0;

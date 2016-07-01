@@ -5,7 +5,8 @@
 
 int main()
 {
-    static Serial comDev(PATH_VIRTUAL_SERIAL_PORT_SEND);
+    static Serial comDev("/dev/i2c-2");
+    //static Serial comDev(PATH_VIRTUAL_SERIAL_PORT_SEND);
 
     boost::asio::io_service io;
 
