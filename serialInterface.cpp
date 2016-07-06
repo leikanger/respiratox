@@ -61,7 +61,10 @@ Serial::~Serial()
     serialPort.close(); 
 }
 
-std::vector<double> Serial::getNextValueVector()
+/* TODO This next function is a free function!! TODO 
+ * TODO     PLAN: Move into a new class!        TODO*/
+std::vector<double> splitValueStringToValueVector(
+/**/                /**/                     const std::string& valueString)
 {
     using std::string;
     const char VALUE_SEPARATOR = '\t';
@@ -69,9 +72,8 @@ std::vector<double> Serial::getNextValueVector()
     const double DEFAULT_VAL = 0;
     std::vector<double> returnValues = {DEFAULT_VAL,DEFAULT_VAL,DEFAULT_VAL};
         // preinit vector so that we can return when error is detected
-    
-    std::string buffer;
-    this->read(&buffer); 
+
+    string buffer = valueString;
     string::size_type nextMark = 0;
     for (int i = 0; i<3; ++i) {
         nextMark = buffer.find(VALUE_SEPARATOR);
@@ -79,13 +81,12 @@ std::vector<double> Serial::getNextValueVector()
         returnValues.at(i) =
                 boost::lexical_cast<double>(buffer.substr(0,nextMark));
         buffer = buffer.substr(nextMark+1);
-        // If nextMark is bigger than buffer.size, no more marks are found.
+        // If nextMark is bigger than buffer.size, no more marks are found
         // Break loop and let possible remaining values default to DEFAULT_VAL.
         if (nextMark > buffer.size()) {
             break;
         }
     }
-
     return returnValues;
 }
 
@@ -109,7 +110,7 @@ std::vector<double> Serial::getNextValueVector()
    *    lese ut denne lengden med asio.read -- det negative er at dette 
    *    kanskje går på bekostning av sikkerhet?
    */
-int Serial::read(std::string* pTekstBuffer)
+void Serial::readIntoBufferArg(std::string* pTekstBuffer)
 {
     const char MESSAGE_SEPARATOR = '\n';
     static char nextChar;
@@ -117,6 +118,7 @@ int Serial::read(std::string* pTekstBuffer)
 
     boost::system::error_code ec;
 
+    // continue till message separator is reached or error ec:
     while (!ec) {
         bASIO::read(serialPort, bASIO::buffer(&nextChar, 1), ec);
         if (nextChar == MESSAGE_SEPARATOR)
@@ -124,23 +126,29 @@ int Serial::read(std::string* pTekstBuffer)
         pTekstBuffer->push_back(nextChar);
     }
     if (ec) {
-        std::cout<<"error : serialPort read(str*) failed : "
+        std::cout<<"error : serialPort readIntoBufferArg(str*) failed : "
                  <<"reported error ec=" 
                  <<ec.message().c_str() <<std::endl;
-        // terminate!! 
         exit(0);
-        return -1;
+        // TODO: throw exception!
         // IKKJE: throw std::string("Serial::read(str*) failed");
-        // ( den er ikkje exception safe - kan kaste sjølv igjen.. )
+        // ( String er ikkje exception safe - kan kaste sjølv igjen.. )
     }
 
     if (nextChar != '\n') {
-		// it must have timed out.
-        return -2;
+        std::cout<<"readIntoBufferArg : it must have timed out.\n";
+
+        return;
         // TODO Gå over til: : throw std::exception("Read timed out!");
 	  }
-    return 0;
 }
+std::string Serial::read()
+{
+    std::string returnVariable;
+    readIntoBufferArg(&returnVariable);
+    return returnVariable;
+}
+
 /* important: messages are separated by the '\n' sign */
 int Serial::write_message(std::string pTextBuffer)
 {

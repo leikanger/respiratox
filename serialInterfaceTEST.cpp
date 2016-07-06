@@ -18,6 +18,10 @@ struct SerialCommunicationFixture {
     
     std::shared_ptr<Serial> pSendPort;
     std::shared_ptr<Serial> pReceivePort;
+
+    std::vector<double> readReceivedValueVector() {
+        return splitValueStringToValueVector( this->pReceivePort->read() );
+    }
 };
 
 //==============================================================================================
@@ -65,7 +69,7 @@ BOOST_AUTO_TEST_CASE( serial_read )
     std::string readBuffer;
 
     TEST::writeStringToFilepath(testString, PATH_VIRTUAL_SERIAL_PORT_SEND);
-    receivePort.read(&readBuffer);
+    receivePort.readIntoBufferArg(&readBuffer);
     BOOST_CHECK_EQUAL(readBuffer, testString);   
 }
 BOOST_AUTO_TEST_CASE( serial_write )
@@ -89,7 +93,7 @@ BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
     std::string testString = "asdfqwer1234æøå";
     std::string stringRead = "";
     F.pSendPort->write_message(testString);
-    F.pReceivePort->read(&stringRead);
+    F.pReceivePort->readIntoBufferArg(&stringRead);
     BOOST_CHECK_EQUAL(testString, stringRead);
 }
 BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
@@ -97,8 +101,7 @@ BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("111.11\t222\t3.3333");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
-    BOOST_CHECK_EQUAL(result.size(), 3);
+    BOOST_CHECK_EQUAL(F.readReceivedValueVector().size(), 3);
 }
 BOOST_AUTO_TEST_CASE( separate_message_into_3_values_when_only_2_present )
 {
@@ -106,15 +109,14 @@ BOOST_AUTO_TEST_CASE( separate_message_into_3_values_when_only_2_present )
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("111.11\t222");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
-    BOOST_CHECK_EQUAL(result.size(), 3);
+    BOOST_CHECK_EQUAL(F.readReceivedValueVector().size(), 3);
 }
 BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
 {
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("111.11\t222\t3.3333");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    std::vector<double> result = F.readReceivedValueVector();
 
     BOOST_CHECK_EQUAL(result[0], 111.11);
     BOOST_CHECK_EQUAL(result[1], 222);
@@ -125,7 +127,7 @@ BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error__3values )
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("111.\t.1\t.0");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    std::vector<double> result = F.readReceivedValueVector();
 
     BOOST_CHECK_EQUAL(result[0], 111);
     BOOST_CHECK_EQUAL(result[1], 0.1);
@@ -136,45 +138,42 @@ BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("1000000000.\t-1000000000\t0");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    std::vector<double> result = F.readReceivedValueVector();
 
     BOOST_CHECK_EQUAL(result[0], 1000000000);
     BOOST_CHECK_EQUAL(result[1], -1000000000);
+    BOOST_CHECK_EQUAL(result[2], 0);
 }
 BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_no_separator )
 {
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("111.1\t222.2");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    std::vector<double> result = F.readReceivedValueVector();
     
     BOOST_CHECK_EQUAL(result[0], 111.1);
     BOOST_CHECK_EQUAL(result[1], 222.2);
     // If last value doesn't exist, it shall be zero
     BOOST_CHECK_EQUAL(result[2], 0);
-
-    cout<<result[0] <<" "<<result[1] <<" "  <<result[2] <<" " <<"\n";
 }
 BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_with_separator )
 {
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("111.1\t222.2\t");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    std::vector<double> result = F.readReceivedValueVector();
     
     BOOST_CHECK_EQUAL(result[0], 111.1);
     BOOST_CHECK_EQUAL(result[1], 222.2);
     // If last value doesn't exist, it shall be zero
     BOOST_CHECK_EQUAL(result[2], 0);
-
-    cout<<result[0] <<" "<<result[1] <<" "  <<result[2] <<" " <<"\n";
 }
 BOOST_AUTO_TEST_CASE( only_one_value_and_no_ending_separator )
 {
     SerialCommunicationFixture F;
 
     F.pSendPort->write_message("111.1");
-    std::vector<double> result = F.pReceivePort->getNextValueVector();
+    std::vector<double> result = F.readReceivedValueVector();
     
     BOOST_CHECK_EQUAL(result[0], 111.1);
     BOOST_CHECK_EQUAL(result[1], 0);
@@ -206,7 +205,7 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
     TEST::ArduinoMOCK test(testMelding);
     std::string message;
     for( int i=5; i>0; --i) {
-        receivePort.read(&message);
+        receivePort.readIntoBufferArg(&message);
         BOOST_CHECK_EQUAL(message, testMelding);
     }
 }
@@ -219,7 +218,7 @@ BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
     TEST::ArduinoMOCK test(testMelding, 0);
     std::string message;
     for( int i=0; i<100; ++i ) {
-        receivePort.read(&message);
+        receivePort.readIntoBufferArg(&message);
         BOOST_CHECK_EQUAL(message, testMelding);
     }
     // This test is unverified: It has never failed..

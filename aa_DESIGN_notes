@@ -1,3 +1,7 @@
+    TODO: SerialInterface er framleis generell. Denne skal gjørast om til å
+    vere interface-klasse (ADAPTOR pattern)
+
+
 PLAN: Programmere med hardwarenær C++/C.
     - NAMESPACE I2C : Lag frittståande funksjonar som håndterar kommunikasjon med I2C
         * Frittståande? 

@@ -1,3 +1,4 @@
+#include "serialBOOST.h"
 #include "serialInterface.h"
 #include <string>
 #include <iostream>
@@ -8,13 +9,13 @@ namespace bASIO=boost::asio;
 
 // Serial interface through virtual serial port
 /**
- * Serial::Serial( const string& portPath, unsinged baudRate, errorCode)
+ * SerialBOOST::SerialBOOST(const string& portPath,unsinged baudRate,errorCode)
  *      \param port device name, example "/dev/ttyUSB0" or "COM4"
  *      \param baud_rate communication speed, example 9600 or 115200
  *      \throws boost::system::system_error if cannot open the
  *      serial device
 **/
-Serial::Serial( const std::string& portPath,
+SerialBOOST::SerialBOOST( const std::string& portPath,
                 unsigned int baudRateArg /*=9600*/,
                 boost::system::error_code* pec /*==null_ptr*/)
     : ioService(), serialPort(ioService), serialPortPath(portPath)
@@ -56,12 +57,12 @@ Serial::Serial( const std::string& portPath,
         exit(0);
     }
 }
-Serial::~Serial()
+SerialBOOST::~SerialBOOST()
 {
     serialPort.close(); 
 }
 
-std::vector<double> Serial::getNextValueVector()
+std::vector<double> SerialBOOST::getNextValueVector()
 {
     using std::string;
     const char VALUE_SEPARATOR = '\t';
@@ -90,7 +91,7 @@ std::vector<double> Serial::getNextValueVector()
 }
 
 /**********************************
- * Serial::read(sting&, unsigned) *
+ * SerialBOOST::read(sting&, unsigned) *
  *  - reads out string of chars untill MESSAGE_SEPARATOR character
  *      (defined on top of function)
  *  TODO Define start of message? Fault-tolerance!    
@@ -109,7 +110,7 @@ std::vector<double> Serial::getNextValueVector()
    *    lese ut denne lengden med asio.read -- det negative er at dette 
    *    kanskje går på bekostning av sikkerhet?
    */
-int Serial::read(std::string* pTekstBuffer)
+int SerialBOOST::read(std::string* pTekstBuffer)
 {
     const char MESSAGE_SEPARATOR = '\n';
     static char nextChar;
@@ -130,7 +131,7 @@ int Serial::read(std::string* pTekstBuffer)
         // terminate!! 
         exit(0);
         return -1;
-        // IKKJE: throw std::string("Serial::read(str*) failed");
+        // IKKJE: throw std::string("SerialBOOST::read(str*) failed");
         // ( den er ikkje exception safe - kan kaste sjølv igjen.. )
     }
 
@@ -142,12 +143,12 @@ int Serial::read(std::string* pTekstBuffer)
     return 0;
 }
 /* important: messages are separated by the '\n' sign */
-int Serial::write_message(std::string pTextBuffer)
+int SerialBOOST::write_message(std::string pTextBuffer)
 {
     pTextBuffer += '\n';
     return write_some(pTextBuffer.c_str(), pTextBuffer.size());
 }
-int Serial::write_some(const char* buf, const int size)
+int SerialBOOST::write_some(const char* buf, const int size)
 {
    boost::system::error_code ec;
    if (!serialPort.is_open()) return -1;
