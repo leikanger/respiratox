@@ -1,11 +1,16 @@
 #include <string>
 #include <iostream>
-#include <fstream>
 #include <boost/asio.hpp>
+#include <fstream>
 #include <vector>
 
 #ifndef SERIALINTERFACE_H
 #define SERIALINTERFACE_H
+
+/*************
+ * Free function: To be moved into separate class
+ *************/
+std::vector<double> splitValueStringToValueVector(const std::string&); 
 
 /************/
 /** Serial **/
@@ -15,11 +20,13 @@ public:
     Serial(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
     ~Serial();
 
-    int read(std::string* pTextBuffer);
+    // TODO før inn const på dei rette funk'er!
+    std::string read();
+    void readIntoBufferArg(std::string* pTextBuffer);
     int write_message(std::string pTextBuffer);
-    std::vector<double> getNextValueVector();
 private:
     int write_some(const char* buf, const int size);
+    // TODO Gjør følgande til peikarar, slik at eg ikkje treng å include asio!
     boost::asio::io_service ioService;
     boost::asio::serial_port serialPort;
     const std::string serialPortPath;
