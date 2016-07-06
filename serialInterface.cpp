@@ -16,6 +16,8 @@ Serial::Serial( const std::string& portPath,
                 boost::system::error_code* pec /*==nullptr*/)
         : serialMock(new SerialBOOST(portPath, baudRateArg, pec))
 {
+    //    Her er veldig bra! Vi kan new'e inn andre subklasser av
+    //    SerialAbstractClass inn i serialMock(...) når vi kjem så langt!
 }
 
 std::string Serial::read()

@@ -1,5 +1,5 @@
 CC=clang++
-CFLAGS=-std=c++11 -Wall -lpthread
+CFLAGS=-std=c++11 -Wall 
 BOOST_LIBR=-lboost_system
 
 all: test_without_running
@@ -16,7 +16,7 @@ test: test_without_running
 	./testAll.out
 
 test_without_running: serialInterfaceTEST.cpp serialInterface.o serialBOOST.o 
-	$(CC) $(CFLAGS) -lboost_unit_test_framework $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.o serialBOOST.o -o testAll.out
+	$(CC) $(CFLAGS) -lboost_unit_test_framework -lpthread $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.o serialBOOST.o -o testAll.out
 
 serialInterface.o: serialInterface.*
 	$(CC) $(CFLAGS) serialInterface.cpp -c
@@ -29,5 +29,8 @@ serialBOOST.o: serialBOOST.cpp serialBOOST.h
 test_old_all_files: *cpp *h
 	$(CC) $(CFLAGS) -lboost_unit_test_framework $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.cpp serialBOOST.cpp -o testAll.out 
 
-clean:
+resetclear:
 	rm *.out *.o
+
+clean:
+	make resetclear ; make 

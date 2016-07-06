@@ -1,3 +1,4 @@
+#include "serialAbstractClass.h"
 #include <string>
 #include <iostream>
 #include <boost/asio.hpp>
@@ -10,9 +11,11 @@
 /************/
 /** SerialBOOST **/
 /************/
-class SerialBOOST {
+class SerialBOOST : public SerialAbstractClass {
 public:
-    SerialBOOST(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
+    SerialBOOST(const std::string& port, 
+    /**/        unsigned int baud_rate =9600, 
+    /**/        boost::system::error_code* pec =nullptr);
     ~SerialBOOST();
 
     // TODO før inn const på dei rette funk'er!
