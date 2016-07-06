@@ -6,6 +6,45 @@ using std::cout;
 //namespace utf = boost::unit_test;
 namespace bASIO = boost::asio;
 
+
+/* TODO This next function is a free function!! TODO 
+ * TODO     PLAN: Move into a new class!        TODO*/
+#include <boost/lexical_cast.hpp>
+std::vector<double> splitValueStringToValueVector(
+/**/                /**/                     const std::string& valueString)
+{
+    using std::string;
+    const char VALUE_SEPARATOR = '\t';
+
+    const double DEFAULT_VAL = 0;
+    std::vector<double> returnValues = {DEFAULT_VAL,DEFAULT_VAL,DEFAULT_VAL};
+        // preinit vector so that we can return when error is detected
+
+    string buffer = valueString;
+    string::size_type nextMark = 0;
+    for (int i = 0; i<3; ++i) {
+        nextMark = buffer.find(VALUE_SEPARATOR);
+
+        returnValues.at(i) =
+                boost::lexical_cast<double>(buffer.substr(0,nextMark));
+        buffer = buffer.substr(nextMark+1);
+        // If nextMark is bigger than buffer.size, no more marks are found
+        // Break loop and let possible remaining values default to DEFAULT_VAL.
+        if (nextMark > buffer.size()) {
+            break;
+        }
+    }
+    return returnValues;
+}
+/* TODO PLAN: Move the previous function to appropriate class/place TODO */
+
+
+
+
+
+
+
+
 // Fixture
 struct SerialCommunicationFixture {
     SerialCommunicationFixture()
@@ -21,6 +60,9 @@ struct SerialCommunicationFixture {
 
     std::vector<double> readReceivedValueVector() {
         return splitValueStringToValueVector( this->pReceivePort->read() );
+    }
+    std::string receivedMessage() {
+        return  pReceivePort->read();
     }
 };
 
@@ -66,20 +108,18 @@ BOOST_AUTO_TEST_CASE( serial_read )
 {
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE); 
     std::string testString = "asdfqwer1234æøå";
-    std::string readBuffer;
 
     TEST::writeStringToFilepath(testString, PATH_VIRTUAL_SERIAL_PORT_SEND);
-    receivePort.readIntoBufferArg(&readBuffer);
-    BOOST_CHECK_EQUAL(readBuffer, testString);   
+    BOOST_CHECK_EQUAL(receivePort.read(), testString);
 }
 BOOST_AUTO_TEST_CASE( serial_write )
 {
     Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_SEND);
     std::string testString = "asdfqwer1234";
+    // Read last line of shell output (without '\n' on end)
     std::string cmdString = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_RECEIVE;
-        // Command reads last line in path (without '\n' on end)
     sendPort.write_message(testString);
-    usleep(1000);
+    usleep(100);
 
     std::string returnFromShell = TEST::exec(cmdString.c_str());
 
@@ -91,10 +131,8 @@ BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
     SerialCommunicationFixture F;
 
     std::string testString = "asdfqwer1234æøå";
-    std::string stringRead = "";
     F.pSendPort->write_message(testString);
-    F.pReceivePort->readIntoBufferArg(&stringRead);
-    BOOST_CHECK_EQUAL(testString, stringRead);
+    BOOST_CHECK_EQUAL(testString, F.receivedMessage());
 }
 BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
 {
@@ -179,8 +217,6 @@ BOOST_AUTO_TEST_CASE( only_one_value_and_no_ending_separator )
     BOOST_CHECK_EQUAL(result[1], 0);
     // If last value doesn't exist, it shall be zero
     BOOST_CHECK_EQUAL(result[2], 0);
-
-    cout<<result[0] <<" "<<result[1] <<" "  <<result[2] <<" " <<"\n";
 }
 
 //*********************************
@@ -203,10 +239,8 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     std::string testMelding="Yeah, test message\t12\t34";
     TEST::ArduinoMOCK test(testMelding);
-    std::string message;
     for( int i=5; i>0; --i) {
-        receivePort.readIntoBufferArg(&message);
-        BOOST_CHECK_EQUAL(message, testMelding);
+        BOOST_CHECK_EQUAL(testMelding, receivePort.read());
     }
 }
 BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
@@ -216,10 +250,8 @@ BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
     Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     std::string testMelding="Yeah, test message\t12\t34";
     TEST::ArduinoMOCK test(testMelding, 0);
-    std::string message;
     for( int i=0; i<100; ++i ) {
-        receivePort.readIntoBufferArg(&message);
-        BOOST_CHECK_EQUAL(message, testMelding);
+        BOOST_CHECK_EQUAL(testMelding, receivePort.read());
     }
     // This test is unverified: It has never failed..
 }

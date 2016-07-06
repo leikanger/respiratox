@@ -2,9 +2,10 @@
 #include <string>
 #include <iostream>
 #include <exception>
-#include <boost/lexical_cast.hpp>
 
 namespace bASIO=boost::asio;
+
+
 
 // Serial interface through virtual serial port
 /**
@@ -59,35 +60,6 @@ Serial::Serial( const std::string& portPath,
 Serial::~Serial()
 {
     serialPort.close(); 
-}
-
-/* TODO This next function is a free function!! TODO 
- * TODO     PLAN: Move into a new class!        TODO*/
-std::vector<double> splitValueStringToValueVector(
-/**/                /**/                     const std::string& valueString)
-{
-    using std::string;
-    const char VALUE_SEPARATOR = '\t';
-
-    const double DEFAULT_VAL = 0;
-    std::vector<double> returnValues = {DEFAULT_VAL,DEFAULT_VAL,DEFAULT_VAL};
-        // preinit vector so that we can return when error is detected
-
-    string buffer = valueString;
-    string::size_type nextMark = 0;
-    for (int i = 0; i<3; ++i) {
-        nextMark = buffer.find(VALUE_SEPARATOR);
-
-        returnValues.at(i) =
-                boost::lexical_cast<double>(buffer.substr(0,nextMark));
-        buffer = buffer.substr(nextMark+1);
-        // If nextMark is bigger than buffer.size, no more marks are found
-        // Break loop and let possible remaining values default to DEFAULT_VAL.
-        if (nextMark > buffer.size()) {
-            break;
-        }
-    }
-    return returnValues;
 }
 
 /**********************************

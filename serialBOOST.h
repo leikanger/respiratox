@@ -7,20 +7,13 @@
 #ifndef SERIALINTERFACE_H
 #define SERIALINTERFACE_H
 
-/*************
- * Free function: To be moved into separate class
- *************/
-std::vector<double> splitValueStringToValueVector(const std::string&); 
-
 /************/
-/** SerialBOOST **/
+/** Serial **/
 /************/
-class SerialBOOST {
+class Serial {
 public:
-    SerialBOOST(const std::string& port, 
-    /**/        unsigned int baud_rate =9600,
-    /**/        boost::system::error_code* pec =nullptr);
-    ~SerialBOOST();
+    Serial(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
+    ~Serial();
 
     // TODO før inn const på dei rette funk'er!
     std::string read();

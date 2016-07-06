@@ -1,4 +1,3 @@
-#include "serialBOOST.h"
 #include "serialInterface.h"
 #include <string>
 #include <iostream>
@@ -9,13 +8,13 @@ namespace bASIO=boost::asio;
 
 // Serial interface through virtual serial port
 /**
- * SerialBOOST::SerialBOOST(const string& portPath,unsinged baudRate,errorCode)
+ * Serial::Serial( const string& portPath, unsinged baudRate, errorCode)
  *      \param port device name, example "/dev/ttyUSB0" or "COM4"
  *      \param baud_rate communication speed, example 9600 or 115200
  *      \throws boost::system::system_error if cannot open the
  *      serial device
 **/
-SerialBOOST::SerialBOOST( const std::string& portPath,
+Serial::Serial( const std::string& portPath,
                 unsigned int baudRateArg /*=9600*/,
                 boost::system::error_code* pec /*==null_ptr*/)
     : ioService(), serialPort(ioService), serialPortPath(portPath)
@@ -57,42 +56,13 @@ SerialBOOST::SerialBOOST( const std::string& portPath,
         exit(0);
     }
 }
-SerialBOOST::~SerialBOOST()
+Serial::~Serial()
 {
     serialPort.close(); 
 }
 
-/* TODO This next function is a free function!! TODO 
- * TODO     PLAN: Move into a new class!        TODO*/
-std::vector<double> splitValueStringToValueVector(
-/**/                /**/                     const std::string& valueString)
-{
-    using std::string;
-    const char VALUE_SEPARATOR = '\t';
-
-    const double DEFAULT_VAL = 0;
-    std::vector<double> returnValues = {DEFAULT_VAL,DEFAULT_VAL,DEFAULT_VAL};
-        // preinit vector so that we can return when error is detected
-
-    string buffer = valueString;
-    string::size_type nextMark = 0;
-    for (int i = 0; i<3; ++i) {
-        nextMark = buffer.find(VALUE_SEPARATOR);
-
-        returnValues.at(i) =
-                boost::lexical_cast<double>(buffer.substr(0,nextMark));
-        buffer = buffer.substr(nextMark+1);
-        // If nextMark is bigger than buffer.size, no more marks are found
-        // Break loop and let possible remaining values default to DEFAULT_VAL.
-        if (nextMark > buffer.size()) {
-            break;
-        }
-    }
-    return returnValues;
-}
-
 /**********************************
- * SerialBOOST::read(sting&, unsigned) *
+ * Serial::read(sting&, unsigned) *
  *  - reads out string of chars untill MESSAGE_SEPARATOR character
  *      (defined on top of function)
  *  TODO Define start of message? Fault-tolerance!    
@@ -151,12 +121,12 @@ std::string Serial::read()
 }
 
 /* important: messages are separated by the '\n' sign */
-int SerialBOOST::write_message(std::string pTextBuffer)
+int Serial::write_message(std::string pTextBuffer)
 {
     pTextBuffer += '\n';
     return write_some(pTextBuffer.c_str(), pTextBuffer.size());
 }
-int SerialBOOST::write_some(const char* buf, const int size)
+int Serial::write_some(const char* buf, const int size)
 {
    boost::system::error_code ec;
    if (!serialPort.is_open()) return -1;
