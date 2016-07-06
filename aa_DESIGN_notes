@@ -1,3 +1,23 @@
+PLAN: Programmere med hardwarenær C++/C.
+    - NAMESPACE I2C : Lag frittståande funksjonar som håndterar kommunikasjon med I2C
+        * Frittståande? 
+        * Nødvendige parametre kan vere private var. i objekta
+            -> sender inn dette som arg. i frifunk'ane
+    - Overordna klasser (i samme namespace?) som har 'file handles' og tilsvarande
+    - Interface-klasser (ADAPTER pattern) slik at TDD er med vidare!
+    - Lagre på disk: Boost filesystem? Droppe boost (for tungt og stort?)
+
+1) Lag interface : I2C ADAPTER
+2) Lag i2c-dummy for å kunne utvikle vidare.
+3) Lag i2c-driver (i C/C++) og inkorporer denne
+4) 
+
+Ting å tenke på:
+    - korleis skal eg lagre data for python binær-data fra C++?
+    - 
+
+
+
 PLAN: DATAINNSAMLING: ===========================================================================================
 
   plan 1: Arduino, asio - hente ut data fra arduino, sende over seriellport.
