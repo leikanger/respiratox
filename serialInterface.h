@@ -12,7 +12,7 @@
 /** Serial **/
 /************/
 class Serial {
-    std::shared_ptr<SerialBOOST> serialMock;
+    std::shared_ptr<SerialBOOST> serialInterface;
 public:
     Serial( const std::string& port,
     /**/    unsigned int baud_rate =9600, 
