@@ -11,11 +11,11 @@
 
 // The two paths are extracted to the following includefile, for convenience..
 #include "pathToVirtualSerialPorts.h"
-#include "serialInterface.h"
+#include "serialBOOST.h"
 
 namespace TEST{
     struct ArduinoMOCK {
-        Serial serialPort; 
+        SerialBOOST serialPort; 
         bool bContinueExecution;
         std::thread mThread;
         const std::string constMessage;

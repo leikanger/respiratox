@@ -15,16 +15,19 @@ main: main.cpp serialInterface.o
 test: test_without_running
 	./testAll.out
 
-test_without_running: serialInterface.o serialInterfaceTEST.cpp
-	$(CC) $(CFLAGS) $(BOOST_LIBR) -lboost_unit_test_framework serialInterfaceTEST.cpp serialInterface.o -o testAll.out
+test_without_running: serialInterfaceTEST.cpp serialInterface.o serialBOOST.o 
+	$(CC) $(CFLAGS) -lboost_unit_test_framework $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.o serialBOOST.o -o testAll.out
 
-serialInterface.o: serialInterface.cpp serialInterface.h
+serialInterface.o: serialInterface.*
 	$(CC) $(CFLAGS) serialInterface.cpp -c
+
+serialBOOST.o: serialBOOST.cpp serialBOOST.h
+	$(CC) $(CFLAGS) $(BOOST_LIBR) serialBOOST.cpp -c
 
 
 
 test_old_all_files: *cpp *h
-	$(CC) $(CFLAGS) -lboost_unit_test_framework $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.cpp -o testAll.out 
+	$(CC) $(CFLAGS) -lboost_unit_test_framework $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.cpp serialBOOST.cpp -o testAll.out 
 
 clean:
 	rm *.out *.o

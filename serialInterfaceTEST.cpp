@@ -48,15 +48,15 @@ std::vector<double> splitValueStringToValueVector(
 // Fixture
 struct SerialCommunicationFixture {
     SerialCommunicationFixture()
-        : pSendPort(new Serial(PATH_VIRTUAL_SERIAL_PORT_SEND)),
-        pReceivePort(new Serial(PATH_VIRTUAL_SERIAL_PORT_RECEIVE))
+        : pSendPort(new SerialBOOST(PATH_VIRTUAL_SERIAL_PORT_SEND)),
+        pReceivePort(new SerialBOOST(PATH_VIRTUAL_SERIAL_PORT_RECEIVE))
     {
         TEST::emptyVirtualSerialportBuffers();
     }
     ~SerialCommunicationFixture() { }
     
-    std::shared_ptr<Serial> pSendPort;
-    std::shared_ptr<Serial> pReceivePort;
+    std::shared_ptr<SerialBOOST> pSendPort;
+    std::shared_ptr<SerialBOOST> pReceivePort;
 
     std::vector<double> readReceivedValueVector() {
         return splitValueStringToValueVector( this->pReceivePort->read() );
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE( serial_port_paths_exist )
 BOOST_AUTO_TEST_CASE( construct_Serial_object )
 {
     boost::system::error_code ec;
-    Serial testObj(PATH_VIRTUAL_SERIAL_PORT_RECEIVE, 9600, &ec);
+    SerialBOOST testObj(PATH_VIRTUAL_SERIAL_PORT_RECEIVE, 9600, &ec);
 
     // Bare test om objektet eksisterer: check ec for feil..
     BOOST_CHECK_MESSAGE( !ec, "Construction of serial object gave error message" <<ec.message().c_str() );
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )
 }
 BOOST_AUTO_TEST_CASE( serial_read )
 {
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE); 
+    SerialBOOST receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE); 
     std::string testString = "asdfqwer1234æøå";
 
     TEST::writeStringToFilepath(testString, PATH_VIRTUAL_SERIAL_PORT_SEND);
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( serial_read )
 }
 BOOST_AUTO_TEST_CASE( serial_write )
 {
-    Serial sendPort(PATH_VIRTUAL_SERIAL_PORT_SEND);
+    SerialBOOST sendPort(PATH_VIRTUAL_SERIAL_PORT_SEND);
     std::string testString = "asdfqwer1234";
     // Read last line of shell output (without '\n' on end)
     std::string cmdString = "head -1 " + PATH_VIRTUAL_SERIAL_PORT_RECEIVE;
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
     // Empty previous messages through virtual serial port
     TEST::emptyVirtualSerialportBuffers();
 
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
+    SerialBOOST receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     std::string testMelding="Yeah, test message\t12\t34";
     TEST::ArduinoMOCK test(testMelding);
     for( int i=5; i>0; --i) {
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
 {
     std::cout<<"Stress test: ";
     TEST::emptyVirtualSerialportBuffers();
-    Serial receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
+    SerialBOOST receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     std::string testMelding="Yeah, test message\t12\t34";
     TEST::ArduinoMOCK test(testMelding, 0);
     for( int i=0; i<100; ++i ) {

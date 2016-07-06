@@ -4,16 +4,16 @@
 #include <fstream>
 #include <vector>
 
-#ifndef SERIALINTERFACE_H
-#define SERIALINTERFACE_H
+#ifndef SERIALBOOST_H
+#define SERIALBOOST_H
 
 /************/
-/** Serial **/
+/** SerialBOOST **/
 /************/
-class Serial {
+class SerialBOOST {
 public:
-    Serial(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
-    ~Serial();
+    SerialBOOST(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
+    ~SerialBOOST();
 
     // TODO før inn const på dei rette funk'er!
     std::string read();
@@ -26,6 +26,5 @@ private:
     boost::asio::serial_port serialPort;
     const std::string serialPortPath;
 };
-
 
 #endif
