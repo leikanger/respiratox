@@ -11,7 +11,7 @@
 
 // The following serial ports are crated with [socat] shell command, and is
 // used for dummy-testing in TDD.
-static const std::string PATH_VIRTUAL_SERIAL_PORT_SEND = "/dev/pts/3";
-static const std::string PATH_VIRTUAL_SERIAL_PORT_RECEIVE= "/dev/pts/5";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_SEND = "/dev/pts/1";
+static const std::string PATH_VIRTUAL_SERIAL_PORT_RECEIVE= "/dev/pts/2";
 
 
