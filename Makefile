@@ -13,12 +13,14 @@ main: main.cpp serialInterface.o
 
 # Neste lager og kjører testen!
 test: test_without_running
+	@echo "\n\n" ; echo "_______________________ Run unit test compilation _______________________" ; echo "";
 	./testAll.out
+	@echo "" ; echo "----------------------- End unit test compilation -----------------------" ; echo "";
 
 test_without_running: serialInterfaceTEST.cpp serialInterface.o serialBOOST.o 
 	$(CC) $(CFLAGS) -lboost_unit_test_framework -lpthread $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.o serialBOOST.o -o testAll.out
 
-serialInterface.o: serialInterface.*
+serialInterface.o: serialInterface.cpp serialInterface.h
 	$(CC) $(CFLAGS) serialInterface.cpp -c
 
 serialBOOST.o: serialBOOST.cpp serialBOOST.h
