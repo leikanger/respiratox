@@ -60,5 +60,8 @@ x-values can be taken out. Create design for how to save values.
 # TODO : Concurrency og timeout: Kjør timeout dersom man venter for lenge?
 Craftmanship i kodeskrivinga!
 
+# TODO : Rydd opp og fjærn der det ikkje er nødvendig å inkludere BOOST!
+# TODO : Endre instansvariable i Class SerialBoost til å vere peikarar, slik at det ikkje er naudsynt å inkludere header.
+
 Decoding message and saving result
 ------------------------------------------------

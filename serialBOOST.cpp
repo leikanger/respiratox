@@ -16,11 +16,9 @@ namespace bASIO=boost::asio;
 **/
 SerialBOOST::SerialBOOST( const std::string& portPath,
                 unsigned int baudRateArg /*=9600*/,
-                boost::system::error_code* pec /*==null_ptr*/)
+                boost::system::error_code* pec /*==nullptr*/)
     : ioService(), serialPort(ioService), serialPortPath(portPath)
 {
-    // For default argument *pec = 0 (no bs::error_code supplied), create
-    // error code-dummy and take dummy's address:
     using std::cout;
     using BSerror_code = boost::system::error_code;
 
@@ -34,15 +32,15 @@ SerialBOOST::SerialBOOST( const std::string& portPath,
         std::cout<<"error : serialPort.open(" <<portPath 
             <<",ec) reported error ec=" <<pec->message().c_str() <<std::endl;
         // terminate!! 
-        exit(0); // TODO return direkte herifra: Husk at ec--som-er-en-ref-variabel-- blir satt ved feil!! 
-        // TODO  Throw exception.
+        exit(0); 
+        // TODO return direkte herifra: Husk at ec--som-er-en-ref-variabel-- blir satt dersom det er feil!! Ta vekk default-ec?
+        // TODO  Evt. Throw exception.
     }
 
-    serialPort.set_option( 
-    /**/                   bASIO::serial_port_base::baud_rate(baudRateArg), 
+    serialPort.set_option( bASIO::serial_port_base::baud_rate(baudRateArg), 
     /**/                   *pec );
     serialPort.set_option( bASIO::serial_port_base::character_size(8) );
-    serialPort.set_option( bASIO::serial_port_base::stop_bits(  /* ... */
+    serialPort.set_option( bASIO::serial_port_base::stop_bits(
     /**/                        bASIO::serial_port_base::stop_bits::one) );
     serialPort.set_option( bASIO::serial_port_base::parity(
     /**/                        bASIO::serial_port_base::parity::none));
@@ -52,10 +50,11 @@ SerialBOOST::SerialBOOST( const std::string& portPath,
     if (*pec) {
         cout<<"error : serialPort set baud_rate faila : reported error ec="
             <<pec->message().c_str() <<std::endl;
-        // terminate!! 
+        // terminate!!  => Change into exception!
         exit(0);
     }
 }
+
 SerialBOOST::~SerialBOOST()
 {
     serialPort.close(); 
@@ -65,12 +64,8 @@ SerialBOOST::~SerialBOOST()
  * SerialBOOST::readIntoBufferArg(sting&, unsigned) *
  *  - reads out string of chars untill MESSAGE_SEPARATOR character
  *      (defined on top of function)
- *  TODO Define start of message? Fault-tolerance!    
- *  An other variant is to save the rest of the message in a static variable,
- *  and continue where it left off last time -- and read in data in batches.
- *  Better for efficiency (but don't start with optimalization!)
  */
-  /* Effektivisere, når alt funker:
+  /* Effektivisere, når alt funker: (Ikkje begynn med optimaliseringen først!)
    *    Alternativ 1: XXX Strategi: Les inn fleire tegn (type:20 chars), og 
    *    leit etter '\n' i denne sekvensen. Når det finnes, klargjør 
    *    returverdi med det som er før (sammen med en static buffer variabel),
@@ -102,8 +97,6 @@ void SerialBOOST::readIntoBufferArg(std::string* pTekstBuffer)
                  <<ec.message().c_str() <<std::endl;
         exit(0);
         // TODO: throw exception!
-        // IKKJE: throw std::string("SerialBOOST::read(str*) failed");
-        // ( String er ikkje exception safe - kan kaste sjølv igjen.. )
     }
 
     if (nextChar != '\n') {
@@ -113,6 +106,7 @@ void SerialBOOST::readIntoBufferArg(std::string* pTekstBuffer)
         // TODO Gå over til: : throw std::exception("Read timed out!");
 	  }
 }
+
 std::string SerialBOOST::read()
 {
     std::string returnVariable;
@@ -120,12 +114,13 @@ std::string SerialBOOST::read()
     return returnVariable;
 }
 
-/* important: messages are separated by the '\n' sign */
 int SerialBOOST::write_message(std::string pTextBuffer)
 {
+    // messages are separated by the '\n' sign: 
     pTextBuffer += '\n';
     return write_some(pTextBuffer.c_str(), pTextBuffer.size());
 }
+
 int SerialBOOST::write_some(const char* buf, const int size)
 {
    boost::system::error_code ec;

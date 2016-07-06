@@ -22,15 +22,17 @@ namespace TEST{
         const std::string constMessage;
         const unsigned int delayBetweenMessagesMs;
     
-        ArduinoMOCK(std::string argConstMessage ="", unsigned int argDelayBetweenMessagesMs =200) 
+        ArduinoMOCK(std::string argConstMessage ="", 
+        /**/        unsigned int argDelayBetweenMessagesMs =200) 
           : serialPort(PATH_VIRTUAL_SERIAL_PORT_SEND) 
           , bContinueExecution{true}
           , constMessage(argConstMessage)
           , delayBetweenMessagesMs(argDelayBetweenMessagesMs)
-          //, mThread([](ArduinoMOCK* pThis){ std::cout<<"lambda bool: " <<pThis->bContinueExecution <<"\n"; pThis->run(); } , this)
         {
             // Todo: move into initializer list?
-            mThread = std::thread([](ArduinoMOCK* ardMOCKobject) { ardMOCKobject->run(); }, this ) ;
+            mThread = std::thread([](ArduinoMOCK* ardMOCKobject) 
+            /**/                     { ardMOCKobject->run(); }, 
+            /**/                     this ) ;
         }
         ~ArduinoMOCK() {        stop();         }
     
@@ -57,7 +59,8 @@ namespace TEST{
             }
             std::cout<<std::endl;
         }
-        // XXX The following method shows how messages shall be written
+
+        // The following function shows how messages shall be written
         std::string getNextMessage()
         {
             if (constMessage == "") {
@@ -77,11 +80,14 @@ namespace TEST{
             return false; 
         }
     }
-    void writeStringToFilepath(const std::string& argString, const std::string& argPath)
+
+    void writeStringToFilepath(const std::string& argString, 
+    /**/           /**/        const std::string& argPath )
     {
         std::string cmdString = "echo '" + argString + "' > " + argPath;
         system(cmdString.c_str());
     }
+
     std::string exec(const char* cmd) {
         std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
         if (!pipe) return "ERROR";
@@ -92,12 +98,13 @@ namespace TEST{
                 result += buffer;
             }
         }
-        // remove last char (this is always(?) an extra '\n' from BASH cmd return).
+        // remove last char (this is always(?) an extra '\n' from
+        // BASH cmd return).
         result.erase(result.size()-1);
         return result;
     }
 
-    /// @brief Different ways a serial port may be flushed.
+    /// @brief Enum with different ways a serial port may be flushed.
     enum flush_type
     {
         flush_receive = TCIFLUSH,
@@ -111,9 +118,9 @@ namespace TEST{
     /// @param what Determines the buffers to flush.
     /// @param error Set to indicate what error occurred, if any.
     void flush_serial_port(
-        boost::asio::serial_port& serial_port,
-        flush_type what,
-        boost::system::error_code& error)
+    /**/boost::asio::serial_port& serial_port,
+    /**/flush_type what,
+    /**/boost::system::error_code& error)
     {
         if (0 == ::tcflush(serial_port.lowest_layer().native_handle(), what))
         {
@@ -127,7 +134,8 @@ namespace TEST{
     void emptyVirtualSerialportBuffers()
     {
         boost::asio::io_service ioservice;
-        boost::asio::serial_port serialPort(ioservice, PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
+        boost::asio::serial_port serialPort(ioservice, 
+        /**/                                PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
         boost::system::error_code ec;
         TEST::flush_serial_port(serialPort, flush_receive, ec);
         if (ec)

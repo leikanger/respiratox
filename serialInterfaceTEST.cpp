@@ -75,21 +75,21 @@ BOOST_AUTO_TEST_CASE( serial_port_paths_exist )
     BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_SEND) ); 
     BOOST_REQUIRE( TEST::fileExists(PATH_VIRTUAL_SERIAL_PORT_RECEIVE) ); 
 }
+
 BOOST_AUTO_TEST_CASE( construct_Serial_object )
 {
     boost::system::error_code ec;
     SerialBOOST testObj(PATH_VIRTUAL_SERIAL_PORT_RECEIVE, 9600, &ec);
 
     // Bare test om objektet eksisterer: check ec for feil..
-    BOOST_CHECK_MESSAGE( !ec, "Construction of serial object gave error message" <<ec.message().c_str() );
+    BOOST_CHECK_MESSAGE( !ec, "Construction of serial object gave error: " 
+            <<ec.message().c_str() );
 }
+
 BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )
 {
     TEST::emptyVirtualSerialportBuffers();
-        // Now, the rest of this test should  be redundant..
 
-    // Write an empty string to ports, to clear last line but also to certify
-    // return from head -1 command..
     TEST::writeStringToFilepath("", PATH_VIRTUAL_SERIAL_PORT_SEND);
     TEST::writeStringToFilepath("", PATH_VIRTUAL_SERIAL_PORT_RECEIVE);
     // Then get the output for the two paths (will get input from the other
@@ -100,10 +100,11 @@ BOOST_AUTO_TEST_CASE( empty_buffer_when_construct_Serial_object )
     std::string ret2 = TEST::exec(cmdStringOUPUT.c_str());
 
     BOOST_CHECK_MESSAGE( ret1 == "", 
-            "pipe __1__ was not clean at startup:\nPipe ONE was not clean at startup : please rerun test -- error if this text lingers");
+            "pipe __1__ was not clean at startup");
     BOOST_CHECK_MESSAGE( ret2 == "",
-            "pipe __2__ was not clean at startup:\nPipe TWO was not clean at startup : please rerun test -- error if this text lingers");
+            "pipe __2__ was not clean at startup");
 }
+
 BOOST_AUTO_TEST_CASE( serial_read )
 {
     SerialBOOST receivePort(PATH_VIRTUAL_SERIAL_PORT_RECEIVE); 
@@ -112,6 +113,7 @@ BOOST_AUTO_TEST_CASE( serial_read )
     TEST::writeStringToFilepath(testString, PATH_VIRTUAL_SERIAL_PORT_SEND);
     BOOST_CHECK_EQUAL(receivePort.read(), testString);
 }
+
 BOOST_AUTO_TEST_CASE( serial_write )
 {
     SerialBOOST sendPort(PATH_VIRTUAL_SERIAL_PORT_SEND);
@@ -134,6 +136,7 @@ BOOST_AUTO_TEST_CASE( send_message_through_virtual_serial_port )
     F.pSendPort->write_message(testString);
     BOOST_CHECK_EQUAL(testString, F.receivedMessage());
 }
+
 BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
 {
     SerialCommunicationFixture F;
@@ -141,14 +144,16 @@ BOOST_AUTO_TEST_CASE( separate_message_into_3_values )
     F.pSendPort->write_message("111.11\t222\t3.3333");
     BOOST_CHECK_EQUAL(F.readReceivedValueVector().size(), 3);
 }
+
 BOOST_AUTO_TEST_CASE( separate_message_into_3_values_when_only_2_present )
 {
-    // The message is separated into 3 value: DEFAULT_VAULE as third value..
     SerialCommunicationFixture F;
 
+    // The message is separated into 3 value: DEFAULT_VAULE as third value..
     F.pSendPort->write_message("111.11\t222");
     BOOST_CHECK_EQUAL(F.readReceivedValueVector().size(), 3);
 }
+
 BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
 {
     SerialCommunicationFixture F;
@@ -160,6 +165,7 @@ BOOST_AUTO_TEST_CASE( resulting_vector_from_message_splitting_seems_correct )
     BOOST_CHECK_EQUAL(result[1], 222);
     BOOST_CHECK_EQUAL(result[2], 3.3333);
 }
+
 BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error__3values )
 {
     SerialCommunicationFixture F;
@@ -171,6 +177,7 @@ BOOST_AUTO_TEST_CASE( badly_formed_data_does_not_give_error__3values )
     BOOST_CHECK_EQUAL(result[1], 0.1);
     BOOST_CHECK_EQUAL(result[2], 0);
 }
+
 BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )
 {
     SerialCommunicationFixture F;
@@ -182,7 +189,8 @@ BOOST_AUTO_TEST_CASE( large_data_also_gives_right_answer )
     BOOST_CHECK_EQUAL(result[1], -1000000000);
     BOOST_CHECK_EQUAL(result[2], 0);
 }
-BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_no_separator )
+
+BOOST_AUTO_TEST_CASE( no_third_value__no_separator )
 {
     SerialCommunicationFixture F;
 
@@ -194,7 +202,8 @@ BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_no_separator )
     // If last value doesn't exist, it shall be zero
     BOOST_CHECK_EQUAL(result[2], 0);
 }
-BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_with_separator )
+
+BOOST_AUTO_TEST_CASE( no_third_value__with_final_separator )
 {
     SerialCommunicationFixture F;
 
@@ -203,9 +212,10 @@ BOOST_AUTO_TEST_CASE( last_value_doesnt_exist_with_separator )
     
     BOOST_CHECK_EQUAL(result[0], 111.1);
     BOOST_CHECK_EQUAL(result[1], 222.2);
-    // If last value doesn't exist, it shall be zero
+    // If last value doesn't exist, it shall be zero (DEFAULT_VAULE)
     BOOST_CHECK_EQUAL(result[2], 0);
 }
+
 BOOST_AUTO_TEST_CASE( only_one_value_and_no_ending_separator )
 {
     SerialCommunicationFixture F;
@@ -214,8 +224,8 @@ BOOST_AUTO_TEST_CASE( only_one_value_and_no_ending_separator )
     std::vector<double> result = F.readReceivedValueVector();
     
     BOOST_CHECK_EQUAL(result[0], 111.1);
+    // given '0' as DEFAULT_VAULE :
     BOOST_CHECK_EQUAL(result[1], 0);
-    // If last value doesn't exist, it shall be zero
     BOOST_CHECK_EQUAL(result[2], 0);
 }
 
@@ -223,7 +233,7 @@ BOOST_AUTO_TEST_CASE( only_one_value_and_no_ending_separator )
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
 BOOST_AUTO_TEST_SUITE( ArduinoMOCK_for_message_designing );
-// NEXT: TESTING ArduinoMOCK class.. NOT WORKING TODO
+// NEXT: TESTING ArduinoMOCK class.. NOT WELL TESTED TODO
 BOOST_AUTO_TEST_CASE( thread_test )
 {
    using std::chrono::seconds;
@@ -231,6 +241,7 @@ BOOST_AUTO_TEST_CASE( thread_test )
    std::this_thread::sleep_for(seconds(1));
    // Verify that all works as it should with ArduinoMOCK!
 }
+
 BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
 {
     // Empty previous messages through virtual serial port
@@ -243,6 +254,7 @@ BOOST_AUTO_TEST_CASE( receive_messages_from_ArduinoMOCK )
         BOOST_CHECK_EQUAL(testMelding, receivePort.read());
     }
 }
+
 BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
 {
     std::cout<<"Stress test: ";
