@@ -226,33 +226,3 @@ BOOST_AUTO_TEST_CASE( stress_test_receive_message_from_ArduinoMOCK )
 BOOST_AUTO_TEST_SUITE_END(); // serial_communication_with_tempfile
 
 
-
-#if 0
-BOOST_TEST_CASE( ReadFromArduino )
-{
-    // MERK: dersom man sender ' ' (space) inn i arduino-monitoren, får man
-    // ikkje med dei to første characters. Dette gir ønske om å teste for
-    // start-character også (i read-funksjonen)!
-    std::string path = "/dev/ttyACM0"; // Eller noke i den duren
-    BOOST_REQUIRE( fileExists(path) );
-    Serial testObj(path, 9600);
-    std::string lestStreng;
-    BOOST_CHECK( testObj.read(&lestStreng) );   // returnerer false ved feil.
-    std::cout<<"HURRA: Eg har lest : [[[" <<lestStreng <<"]]]\n";
-}
-#endif
-
-
-
-/*
-BOOST_AUTO_TEST_SUITE( Arduino_serial_communication );
-BOOST_AUTO_TEST_CASE( send_and_receive )
-{
-    Serial realArduino("/dev/ttyASM1");
-    realArduino.sendMessage("fraSoftware");
-}
-BOOST_AUTO_TEST_SUITE_END();
-*/
-// TODO hugs å finne/respondere for exception ved feil filepath! TODO Ved
-// construction av Serial object!
-// TODO

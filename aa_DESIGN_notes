@@ -1,4 +1,6 @@
-    TODO: SerialInterface er framleis generell. Denne skal gjørast om til å
+    !!! - TODO: Flytt serial-klasser inn i subfolder.
+
+    !!! - TODO: SerialInterface er framleis generell. Denne skal gjørast om til å
     vere interface-klasse (ADAPTOR pattern)
 
 
