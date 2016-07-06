@@ -13,12 +13,14 @@
 std::vector<double> splitValueStringToValueVector(const std::string&); 
 
 /************/
-/** Serial **/
+/** SerialBOOST **/
 /************/
-class Serial {
+class SerialBOOST {
 public:
-    Serial(const std::string& port, unsigned int baud_rate =9600, boost::system::error_code* pec =nullptr);
-    ~Serial();
+    SerialBOOST(const std::string& port, 
+    /**/        unsigned int baud_rate =9600,
+    /**/        boost::system::error_code* pec =nullptr);
+    ~SerialBOOST();
 
     // TODO før inn const på dei rette funk'er!
     std::string read();
