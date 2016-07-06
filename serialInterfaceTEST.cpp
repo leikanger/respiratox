@@ -48,15 +48,15 @@ std::vector<double> splitValueStringToValueVector(
 // Fixture
 struct SerialCommunicationFixture {
     SerialCommunicationFixture()
-        : pSendPort(new SerialBOOST(PATH_VIRTUAL_SERIAL_PORT_SEND)),
-        pReceivePort(new SerialBOOST(PATH_VIRTUAL_SERIAL_PORT_RECEIVE))
+        : pSendPort(new Serial(PATH_VIRTUAL_SERIAL_PORT_SEND)),
+        pReceivePort(new Serial(PATH_VIRTUAL_SERIAL_PORT_RECEIVE))
     {
         TEST::emptyVirtualSerialportBuffers();
     }
     ~SerialCommunicationFixture() { }
     
-    std::shared_ptr<SerialBOOST> pSendPort;
-    std::shared_ptr<SerialBOOST> pReceivePort;
+    std::shared_ptr<Serial> pSendPort;
+    std::shared_ptr<Serial> pReceivePort;
 
     std::vector<double> readReceivedValueVector() {
         return splitValueStringToValueVector( this->pReceivePort->read() );

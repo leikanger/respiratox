@@ -57,6 +57,8 @@ x-values can be taken out. Create design for how to save values.
 
 #TODO : Update MOCK objec, so that different messages gives different xvalues e.g.
 
+# TODO : Concurrency og timeout: Kjør timeout dersom man venter for lenge?
+Craftmanship i kodeskrivinga!
 
 Decoding message and saving result
 ------------------------------------------------

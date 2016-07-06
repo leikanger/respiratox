@@ -62,7 +62,7 @@ SerialBOOST::~SerialBOOST()
 }
 
 /**********************************
- * SerialBOOST::read(sting&, unsigned) *
+ * SerialBOOST::readIntoBufferArg(sting&, unsigned) *
  *  - reads out string of chars untill MESSAGE_SEPARATOR character
  *      (defined on top of function)
  *  TODO Define start of message? Fault-tolerance!    

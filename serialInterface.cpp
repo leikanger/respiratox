@@ -15,17 +15,15 @@ Serial::Serial( const std::string& portPath,
                 unsigned int baudRateArg /*=9600*/,
                 boost::system::error_code* pec /*==nullptr*/)
         : serialMock(new SerialBOOST(portPath, baudRateArg, pec))
-        //: serialMock(new SerialBOOST(portPath))
 {
-    std::cout<<"Constructor : Serial\n";
 }
 
 std::string Serial::read()
 {
-    return "UFERDIG";
+    return serialMock->read();
 }
 
-int Serial::write_message(std::string pTextBuffer)
+void Serial::write_message(std::string pTextBuffer)
 {
-    return 0; // Denne skal ikkje returnere int! TODO
+    serialMock->write_message(pTextBuffer);
 }

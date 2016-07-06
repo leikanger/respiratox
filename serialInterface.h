@@ -19,7 +19,7 @@ public:
     /**/    boost::system::error_code* pec =nullptr);
 
     std::string read();
-    int write_message(std::string pTextBuffer);
+    void write_message(std::string pTextBuffer);
 private:
 };
 

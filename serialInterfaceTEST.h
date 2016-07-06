@@ -11,7 +11,8 @@
 
 // The two paths are extracted to the following includefile, for convenience..
 #include "pathToVirtualSerialPorts.h"
-#include "serialBOOST.h"
+#include "serialInterface.h"
+//#include "serialBOOST.h"
 
 namespace TEST{
     struct ArduinoMOCK {
