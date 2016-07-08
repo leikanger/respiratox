@@ -13,9 +13,9 @@ main: main.cpp serialInterface.o
 
 # Neste lager og kjører testen!
 test: test_without_running
-	@echo "\n\n" ; echo "_______________________ Run unit test compilation _______________________" ; echo "";
+	@echo "\n" ; echo "_______________________ Run unit test compilation _______________________" ; echo "";
 	./testAll.out
-	@echo "" ; echo "_______________________ End unit test compilation _______________________" ; echo "";
+	@echo ""
 
 test_without_running: serialInterfaceTEST.cpp serialInterface.o serialBOOST.o 
 	$(CC) $(CFLAGS) -lboost_unit_test_framework -lpthread $(BOOST_LIBR) serialInterfaceTEST.cpp serialInterface.o serialBOOST.o -o testAll.out
